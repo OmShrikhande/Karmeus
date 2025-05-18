@@ -1,0 +1,16 @@
+# Ignore Firebase config file
+js/FirebseConfig.js
+
+# Ignore package files
+package.json
+package-lock.json
+yarn-error.log
+yarn.lock
+
+# Node modules (if present)
+node_modules/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/

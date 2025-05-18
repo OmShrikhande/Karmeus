@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Device Control</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
+  <h2>Device Status:</h2>
+  <button id="toggleBtn">Loading...</button>
+
+  <script>
+    // 🔧 Your Firebase config here
+    const firebaseConfig = {
+    apiKey: "AIzaSyDp44nlOeMDvHowzE0gepOuzck9OCSqEDI",
+    authDomain: "karmeus-43cbe.firebaseapp.com",
+    projectId: "karmeus-43cbe",
+    storageBucket: "karmeus-43cbe.firebasestorage.app",
+    messagingSenderId: "596599272256",
+    appId: "1:596599272256:web:5ff93d0bbcce35713040a5",
+    measurementId: "G-K7DDEFQ0MT"
+  };
+
+
+
+    // 🔌 Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const deviceRef = db.ref("deviceStatus");
+
+    const toggleBtn = document.getElementById("toggleBtn");
+
+    // 🚀 Update UI when data changes
+    deviceRef.on("value", (snapshot) => {
+      const status = snapshot.val();
+      toggleBtn.textContent = status === "on" ? "Turn OFF" : "Turn ON";
+    });
+
+    // ⚡ Toggle status on button click
+    toggleBtn.addEventListener("click", async () => {
+      const snapshot = await deviceRef.once("value");
+      const currentStatus = snapshot.val();
+      deviceRef.set(currentStatus === "on" ? "off" : "on");
+    });
+  </script>
+
+  <?php
+  // filepath: c:\xampp\htdocs\eistatech\auth.php
+  session_start();
+
+  // Check if the user is logged in
+  function isLoggedIn() {
+      return isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
+  }
+
+  // Restrict access to specific pages
+  function restrictAccess($allowedPages) {
+      $currentPage = basename($_SERVER['PHP_SELF']);
+      if (!isLoggedIn() && $currentPage !== 'index.php') {
+          // Redirect to index.php if not logged in
+          header('Location: index.php');
+          exit();
+      } elseif (isLoggedIn() && !in_array($currentPage, $allowedPages)) {
+          // Redirect to home.php if trying to access unauthorized pages
+          header('Location: home.php');
+          exit();
+      }
+  }
+  ?>
+</body>
+</html>

@@ -1,0 +1,237 @@
+:root {
+      --bg: #ffffff;
+      --text: #111111;
+      --primary: #0057ff;
+      --card-bg: #f2f2f2;
+    }
+    [data-theme="dark"] {
+      --bg: #111111;
+      --text: #ffffff;
+      --primary: #3399ff;
+      --card-bg: #1e1e1e;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(120deg, #e0e7ff 0%, #f8fafc 100%);
+      color: var(--text);
+      transition: background 0.3s, color 0.3s;
+    }
+    [data-theme="dark"] body {
+      background: linear-gradient(120deg, #23243a 0%, #18192b 100%);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: var(--card-bg);
+      animation: fadeIn 1s ease-in;
+    }
+    nav a {
+      margin: 0 1rem;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .theme-toggle {
+      cursor: pointer;
+      padding: 0.4rem 0.8rem;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+    }
+    .hero {
+      padding: 4rem 2rem;
+      text-align: center;
+      animation: slideIn 1.5s ease-out;
+    }
+    .hero h1 {
+      font-size: 2.5rem;
+    }
+    .typewriter {
+      display: inline-block;
+      overflow: none;
+      white-space: nowrap;
+      border-right: 2px solid var(--text);
+      width: 0;
+      animation: typewriter 1s steps(5, end) 1s forwards, blink 0.5s step-end infinite alternate;
+    }
+    .overview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+    }
+    .card {
+      background: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInCards 1s ease-in forwards;
+    }
+    .card:nth-child(1) {
+      animation-delay: 0.2s;
+    }
+    .card:nth-child(2) {
+      animation-delay: 0.4s;
+    }
+    .card:nth-child(3) {
+      animation-delay: 0.6s;
+    }
+    .form-section {
+      max-width: 50vw;
+      margin: 40px auto;
+      padding: 2.5rem 2rem 2rem 2rem;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 8px 32px rgba(60,60,120,0.15);
+      position: relative;
+      z-index: 2;
+      transition: box-shadow 0.3s;
+      text-align: center;
+      animation: fadeIn 1s ease-in;
+    }
+    [data-theme="dark"] .form-section {
+      background: #23243a;
+      color: #fff;
+      box-shadow: 0 8px 32px rgba(20,20,40,0.5);
+    }
+    .form-section h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .form-section form {
+      display: block;
+      max-width: 100%;
+      width: 100%;
+      padding: 0 1.2rem; /* Increased horizontal padding */
+      box-sizing: border-box;
+      text-align: left;
+    }
+    .form-section form input,
+    .form-section form select {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      margin-bottom: 1rem;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      background: #f8f8fa;
+      font-size: 1rem;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+    [data-theme="dark"] .form-section form input,
+    [data-theme="dark"] .form-section form select {
+      background: #2d2e4a;
+      color: #fff;
+      border: 1px solid #444;
+    }
+    .form-section form input:focus,
+    .form-section form select:focus {
+      border: 1.5px solid #4f8cff;
+      outline: none;
+      box-shadow: 0 0 0 2px #4f8cff33;
+    }
+    .form-section button[type="submit"] {
+      width: 100%;
+      padding: 0.9rem 0;
+      background: linear-gradient(90deg, #4f8cff 60%, #6b47dc 100%);
+      color: #fff;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #4f8cff22;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .form-section button[type="submit"]:hover {
+      background: linear-gradient(90deg, #6b47dc 60%, #4f8cff 100%);
+      transform: translateY(-2px) scale(1.03);
+    }
+    .toggle-link {
+      display: block;
+      text-align: center;
+      margin-top: 1.2rem;
+      color: #4f8cff;
+      cursor: pointer;
+      font-weight: 500;
+      text-decoration: underline;
+      transition: color 0.2s;
+    }
+    .toggle-link:hover {
+      color: #6b47dc;
+      text-decoration: none;
+    }
+    #signupExtra {
+      animation: fadeIn 0.5s;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      background: var(--card-bg);
+      margin-top: 2rem;
+      opacity: 0;
+      animation: fadeInFooter 1s ease-in forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideIn {
+      from { transform: translateX(-100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes typewriter {
+      to { width: 10%; }
+    }
+    @keyframes blink {
+      50% { border-color: transparent; }
+    }
+    @keyframes fadeInCards {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInFooter {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @media (max-width: 600px) {
+      .form-section {
+        max-width: 98vw;
+        padding: 1.2rem 0.5rem 1.5rem 0.5rem;
+        border-radius: 10px;
+      }
+      .form-section form {
+        padding: 0 0.2rem;
+      }
+      .form-section h2 {
+        font-size: 1.4rem;
+      }
+      .form-section button[type="submit"] {
+        font-size: 1rem;
+        padding: 0.8rem 0;
+      }
+      .overview {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 1rem;
+      }
+      .hero {
+        padding: 2rem 0.5rem;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .form-section {
+        padding: 0.7rem 0.1rem 1rem 0.1rem;
+      }
+      .form-section form {
+        padding: 0 0.1rem;
+      }
+    }

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Details | Karmeus</title>
+  <link rel="stylesheet" href="./../css/forms.css" />
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+<body>
+  <canvas id="matrix-bg" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none;"></canvas>
+  <canvas id="pipes-bg" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none;"></canvas>
+  <header class="sticky-header">
+    <span class="site-title" id="siteTitle">MySite</span>
+    <div class="header-actions">
+      <button class="theme-toggle" onclick="toggleTheme()">🌙 Toggle Theme</button>
+    </div>
+  </header>
+
+  <h1>Form Page</h1>
+
+  <div class="form-container">
+    <!-- Place this just above your <form id="multiStepForm"> -->
+    <div id="formNotification" style="color: red; margin-bottom: 1em;"></div>
+
+    <!-- Step Indicator -->
+    <div class="step-indicator">
+      <div class="active" data-step="Step 1" onclick="goToStep(0)"></div>
+      <div data-step="Step 2" onclick="goToStep(1)"></div>
+      <div data-step="Step 3" onclick="goToStep(2)"></div>
+    </div>
+
+    <form id="multiStepForm">
+      <!-- Step 0: Device Information -->
+      <div class="step-content active" id="step0">
+        <div class="form-group">
+          <label for="deviceName">Device Name</label>
+          <input type="text" id="deviceName" placeholder="Enter device name" required />
+        </div>
+        <div class="form-group full-width">
+          <label for="deviceDescription">Description</label>
+          <textarea id="deviceDescription" placeholder="Enter device description" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="deviceType">Device Type</label>
+          <select id="deviceType" required>
+            <option value="" disabled selected>Select device type</option>
+            <option value="sensor">Sensor</option>
+            <option value="actuator">Actuator</option>
+            <option value="camera">Camera</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="appKey">App Key</label>
+          <input type="text" id="appKey" placeholder="Generated App Key" readonly />
+        </div>
+        <div class="form-group">
+          <label for="room">Room</label>
+          <input type="text" id="room" placeholder="Enter room name" required />
+        </div>
+        <div class="form-group">
+          <label for="home">Home</label>
+          <input type="text" id="home" placeholder="Enter home name" required />
+        </div>
+      </div>
+
+      <!-- Step 1 -->
+      <div class="step-content" id="step1">
+        <h2>Notification Settings</h2>
+        <p>Enable notifications for the following events:</p>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="alertNotification" />
+            Alerts
+          </label>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="connectDisconnectNotification" />
+            When this device connects or disconnects
+          </label>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="onOffNotification" />
+            When this device is turned on or off
+          </label>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step-content" id="step2">
+        <h2>Device Wattage</h2>
+        <p>Specify the wattage for this device (optional):</p>
+        <div class="form-group">
+          <label for="deviceWattage">Wattage (in watts)</label>
+          <input type="number" id="deviceWattage" placeholder="Enter wattage (e.g., 100)" />
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-color);">
+          You can skip this step if you don't want to specify the wattage.
+        </p>
+      </div>
+
+      <div class="form-navigation">
+        <button type="button" id="prevBtn" onclick="changeStep(-1)">Back</button>
+        <button type="button" id="nextBtn" onclick="validateStep()">Next</button>
+        <button type="submit" id="submitBtn" style="display:none;">Submit</button>
+      </div>
+    </form>
+
+    <footer style="text-align:center; margin-top:2rem; color:#888;">
+      &copy; <span id="companyYear"></span> <span id="companyName">Your Company</span>.
+      <span id="developerCredit">Developed by <span id="developerName">developer</span></span>
+    </footer>
+  </div>
+
+  <script src="./../js/forms.js"></script>
+  <script src="./../js/FirebseConfig.js" ></script>
+  <script>
+
+
+// Call updateNavigationButtons(step) whenever you change steps
+// For example, in your changeStep or goToStep function
+  </script>
+
+</body>
+</html>

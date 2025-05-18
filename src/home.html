@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home - Device Dashboard</title>
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="./../js/FirebseConfig.js"></script>
+  <script src="../js/home.js"></script>
+</head>
+<body>
+  <header class="sticky-header">
+    <span class="site-title">MySite</span>
+    <div class="header-actions">
+      <button class="theme-toggle" onclick="toggleTheme()">🌙 Toggle Theme</button>
+      <a href="#" class="logout-btn">Logout</a>
+    </div>
+  </header>
+  <div class="hero-banner">
+    <h1 style="margin-bottom: 0.2em;">Smart Device Dashboard</h1>
+    <div class="welcome-user" id="welcomeUser"></div>
+  </div>
+
+  <div class="container">
+    <div class="dashboard-row">
+      <button class="add-device-btn" onclick="addNewDevice()">+ Add New Device</button>
+      <button class="delete-device-btn" onclick="deleteDevice()">🗑️ Delete Device</button>
+      <button class="modify-device-btn" onclick="modifyDevice()">✏️ Modify Device</button>
+    </div>
+    <div class="device-grid" id="deviceGrid"></div>
+  </div>
+
+  <footer>
+    <p>
+      &copy; 2025 Your Company. All rights reserved.<br>
+      <span id="developerCredit" style="font-size:1em; color:#666;">Developed by Om Shrikhande</span>
+    </p>
+  </footer>
+
+</body>
+</html>

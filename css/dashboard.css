@@ -1,0 +1,487 @@
+/* Root theme variables */
+:root {
+  --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #f5f7fa 100%);
+  --bg-color: #f5f7fa;
+  --text-color: #222;
+  --header-bg: #0057ff;
+  --header-text: #fff;
+  --card-bg: #ff9800;
+  --card-blur: blur(8px);
+  --card-shadow: 0 8px 32px 0 rgba(31,38,135,0.12);
+  --button-bg: #0057ff;
+  --button-text: #fff;
+  --button-hover-bg: #0041cc;
+  --button-hover-text: #fff;
+  --footer-bg: #0057ff;
+  --footer-text: #fff;
+  --glow: none;
+}
+
+[data-theme="dark"] {
+  --bg-gradient: linear-gradient(135deg, #232a3b 0%, #181c24 100%);
+  --bg-color: #181c24;
+  --text-color: #f5f7fa;
+  --header-bg: #232a3b;
+  --header-text: #fff;
+  --card-bg: rgba(35,42,59,0.85);
+  --card-blur: blur(4px);
+  --card-shadow: 0 8px 32px 0 rgba(0,0,0,0.18);
+  --button-bg: #0057ff;
+  --button-text: #fff;
+  --button-hover-bg: #003a99;
+  --button-hover-text: #fff;
+  --footer-bg: #232a3b;
+  --footer-text: #fff;
+  --glow: 0 0 80px 20px #0057ff66, 0 0 120px 40px #00c6ff33;
+}
+
+html, body {
+  height: 100%;
+  min-height: 100vh;
+  background: var(--bg-gradient);
+  color: var(--text-color);
+  font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+  margin: 0;
+  padding: 0px;
+  box-sizing: border-box;
+  transition: background 0.5s, color 0.3s;
+  position: relative;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-gradient);
+  box-shadow: var(--glow);
+}
+
+/* Sticky concise header - single line */
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--header-bg);
+  color: var(--header-text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.7rem 1.5rem;
+  min-height: 48px;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 12px rgba(0,87,255,0.10);
+  border-radius: 0 0 1.5rem 1.5rem;
+  animation: headerFadeIn 1s;
+}
+@keyframes headerFadeIn {
+  from { opacity: 0; transform: translateY(-30px);}
+  to { opacity: 1; transform: translateY(0);}
+}
+
+.sticky-header .site-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 8px #0057ff44;
+  transition: color 0.3s;
+}
+
+.sticky-header .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.sticky-header .theme-toggle {
+  background: linear-gradient(90deg, #0057ff 60%, #00c6ff 100%);
+  color: #fff;
+  border: none;
+  padding: 0.4rem 1.2rem;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: 0 2px 12px #0057ff33, 0 0 0 #00c6ff00;
+  transition: background 0.3s, color 0.3s, box-shadow 0.3s, transform 0.2s;
+  outline: none;
+  position: relative;
+  overflow: hidden;
+}
+.sticky-header .theme-toggle::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 30px;
+  box-shadow: 0 0 16px 4px #00c6ff66;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.sticky-header .theme-toggle:hover,
+.sticky-header .theme-toggle:focus {
+  background: linear-gradient(90deg, #00c6ff 60%, #0057ff 100%);
+  color: #fff;
+  box-shadow: 0 4px 24px #00c6ff66, 0 0 0 #0057ff00;
+  transform: translateY(-2px) scale(1.04);
+}
+.sticky-header .theme-toggle:hover::after,
+.sticky-header .theme-toggle:focus::after {
+  opacity: 1;
+}
+
+.sticky-header .logout-btn {
+  background: #fff;
+  color: #0057ff;
+  border: none;
+  padding: 0.4rem 1.1rem;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background 0.3s, color 0.3s, transform 0.2s;
+  box-shadow: 0 2px 8px #0057ff22;
+}
+.sticky-header .logout-btn:hover {
+  background: #0041cc;
+  color: #fff;
+  transform: scale(1.05);
+}
+
+/* Hero banner */
+.hero-banner {
+  background: linear-gradient(120deg, #0057ff 60%, #00c6ff 100%);
+  color: #fff;
+  padding: 1.3rem 1rem 1.1rem 1rem;
+  text-align: center;
+  border-radius: 0 0 2rem 2rem;
+  box-shadow: 0 8px 32px rgba(0,87,255,0.10);
+  margin-bottom: 1.2rem;
+  position: relative;
+  overflow: hidden;
+  animation: heroFadeIn 1.2s;
+}
+@keyframes heroFadeIn {
+  from { opacity: 0; transform: translateY(-40px);}
+  to { opacity: 1; transform: translateY(0);}
+}
+.hero-banner h1 {
+  font-size: 1.6rem;
+  margin: 0 0 0.2rem 0;
+  letter-spacing: 1px;
+  font-weight: 700;
+  text-shadow: 0 2px 12px #0057ff55;
+}
+.hero-banner .welcome-user {
+  font-size: 1.1rem;
+  margin-top: 0.5em;
+  margin-bottom: 0.2rem;
+  font-weight: 500;
+  color: #e0e0e0;
+  text-align: left;
+  animation: welcomeSlideIn 1.2s;
+}
+@keyframes welcomeSlideIn {
+  from { opacity: 0; transform: translateX(-40px);}
+  to { opacity: 1; transform: translateX(0);}
+}
+
+/* Device section title with glow */
+.device-section-title {
+  font-size: 1.4rem;
+  color: #0057ff;
+  margin-bottom: 1.2rem;
+  text-align: left;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+  text-shadow: 0 0 8px #00c6ff55, 0 2px 8px #0057ff22;
+  animation: glowTitle 2s infinite alternate;
+}
+@keyframes glowTitle {
+  from { text-shadow: 0 0 8px #00c6ff55, 0 2px 8px #0057ff22;}
+  to { text-shadow: 0 0 24px #00c6ff99, 0 2px 16px #0057ff44;}
+}
+
+/* Device grid: 3 cards per row, responsive */
+.device-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-bottom: 2rem;
+  width: 100%;
+  animation: fadeIn 1.2s;
+}
+@keyframes fadeIn {
+  from { opacity: 0;}
+  to { opacity: 1;}
+}
+@media (max-width: 1100px) {
+  .device-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.2rem;
+  }
+}
+@media (max-width: 700px) {
+  .device-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+/* Device card styling - glassmorphism */
+.device-card {
+  background: var(--card-bg);
+  color: var(--text-color);
+  padding: 1.2rem 1rem 1rem 1rem;
+  border-radius: 1.2rem;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: transform 0.25s, box-shadow 0.25s, background 0.4s;
+  min-width: 0;
+  min-height: 180px;
+  max-width: 100%;
+  backdrop-filter: var(--card-blur);
+  border: 1.5px solid #e3eaff;
+  position: relative;
+  overflow: hidden;
+  margin: 5rem ;
+  margin-left: 30px;
+}
+.device-card:hover {
+  transform: translateY(-8px) scale(1.03) rotate(-1deg);
+  box-shadow: 0 12px 36px #0057ff33, 0 2px 8px #00c6ff22;
+  background: rgba(255,255,255,0.92);
+}
+[data-theme="dark"] .device-card:hover {
+  background: rgba(35,42,59,0.98);
+}
+[data-theme="dark"] .device-card {
+  background-color: var(--card-bg);
+}
+[data-theme="light"] .device-card {
+  background-color: var(--card-bg);
+}
+.device-card h3 {
+  margin: 0 0 0.5rem 0;
+  color: #555589;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 8px #0057ff22;
+}
+.device-card p {
+  margin: 0.2rem 0;
+  font-size: 1.01rem;
+}
+.device-card .status-dot {
+  display: inline-block;
+  width: 0.8em;
+  height: 0.8em;
+  border-radius: 50%;
+  margin-right: 0.5em;
+  background: #bbb;
+  vertical-align: middle;
+  box-shadow: 0 0 8px #bbb444;
+  transition: box-shadow 0.3s;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.device-card .status-dot.on {
+  background: #00c853;
+  box-shadow: 0 0 12px #00c85388;
+}
+.device-card .status-dot.off {
+  background: #d50000;
+  box-shadow: 0 0 12px #d5000088;
+}
+.device-card button {
+  margin-top: 1rem;
+  background: var(--button-bg);
+  color: var(--button-text);
+  border: none;
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background 0.3s, color 0.3s, transform 0.2s;
+  align-self: flex-end;
+  box-shadow: 0 2px 8px #0057ff22;
+}
+.device-card button:hover {
+  background: var(--button-hover-bg);
+  color: var(--button-hover-text);
+  transform: scale(1.07);
+}
+
+/* Room Card */
+.room-card {
+  background: var(--card-bg, #fff);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+}
+
+.room-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--accent, #0057ff);
+}
+
+.room-devices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+}
+
+.device-card {
+  background: #f6f8fa;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  padding: 1rem 1.2rem;
+  min-width: 180px;
+  max-width: 220px;
+  flex: 1 1 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+}
+
+.device-status {
+  position: absolute;
+  top: 0.7rem;
+  right: 1rem;
+  font-size: 0.95em;
+  font-weight: 700;
+  padding: 0.2em 0.8em;
+  border-radius: 12px;
+  background: #eee;
+  color: #333;
+}
+.device-status.on {
+  background: #27ae60;
+  color: #fff;
+}
+.device-status.off {
+  background: #e74c3c;
+  color: #fff;
+}
+
+.device-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 1.2em;
+}
+.device-type {
+  font-size: 0.98rem;
+  color: #888;
+  margin-top: 0.3em;
+}
+.device-desc {
+  font-size: 0.95rem;
+  margin-top: 0.5em;
+  color: #555;
+}
+.no-devices {
+  color: #888;
+  font-style: italic;
+  margin: 1em 0;
+}
+
+/* Add, delete, and modify device buttons */
+.add-device-btn,
+.delete-device-btn,
+.modify-device-btn {
+  margin-left: 0.5rem;
+  background: #fff;
+  color: #0057ff;
+  border: 2px solid #0057ff;
+  padding: 0.7rem 1.5rem;
+  border-radius: 30px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s, border 0.3s, transform 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+.add-device-btn:hover,
+.delete-device-btn:hover,
+.modify-device-btn:hover {
+  background: #0057ff;
+  color: #fff;
+  border: 2px solid #0057ff;
+  transform: scale(1.05);
+}
+
+/* Dashboard row */
+.dashboard-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;           /* Space between buttons */
+  margin: 1.5rem 2rem; /* Space around the whole row */
+  flex-wrap: wrap;
+}
+.dashboard-row .welcome-user {
+text-align:left;
+font-size:1.2em; 
+margin-top:0.5em; 
+margin-bottom:1em; 
+margin-right: 4emx;
+}
+
+/* Footer styling - small and sticky */
+footer {
+  background: var(--footer-bg);
+  color: var(--footer-text);
+  text-align: center;
+  padding: 0.7rem 0 0.5rem 0;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  box-shadow: 0 -2px 12px rgba(0,87,255,0.10);
+  border-radius: 1.2rem 1.2rem 0 0;
+  margin-top: auto;
+  width: 100%;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  animation: footerFadeIn 1.2s;
+}
+@keyframes footerFadeIn {
+  from { opacity: 0; transform: translateY(40px);}
+  to { opacity: 1; transform: translateY(0);}
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .hero-banner h1 { font-size: 1.25rem; }
+  .device-section-title { font-size: 1.15rem; }
+  .device-card { padding: 1rem 0.7rem 0.8rem 0.7rem; }
+}
+@media (max-width: 700px) {
+  .sticky-header { padding: 0.5rem 0.7rem; font-size: 1rem;}
+  .hero-banner { padding: 1rem 0.5rem 0.7rem 0.5rem; }
+  .device-section-title { font-size: 1.05rem; }
+  .add-device-btn { font-size: 1rem; padding: 0.6rem 1.2rem; }
+  .device-card { padding: 0.8rem 0.5rem 0.7rem 0.5rem; }
+  footer { font-size: 0.95rem; padding: 0.5rem 0 0.3rem 0;}
+}
+@media (max-width: 500px) {
+  .sticky-header { font-size: 0.98rem; min-height: 40px;}
+  .hero-banner h1 { font-size: 1.05rem; }
+  .device-section-title { font-size: 0.98rem; }
+  .device-card h3 { font-size: 1rem; }
+  .device-card p { font-size: 0.95rem; }
+  .add-device-btn { font-size: 0.95rem; padding: 0.5rem 0.7rem; }
+}
+
+/* Utility: Hide scrollbars on mobile for device grid */
+.device-grid {
+  scrollbar-width: none;
+}
+.device-grid::-webkit-scrollbar {
+  display: none;
+}
