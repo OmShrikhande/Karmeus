@@ -1,6 +1,9 @@
 # Ignore Firebase config file
 js/FirebseConfig.js
 
+# ignore index.html
+index.html
+
 # Ignore package files
 package.json
 package-lock.json
