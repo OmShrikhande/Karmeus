@@ -6,8 +6,8 @@ function logout() {
     localStorage.removeItem('currentUserEmail');
     sessionStorage.removeItem('currentUserEmail');
     localStorage.removeItem('currentUserEmailHash');
-    // Redirect to main.html
-    window.location.href = './../main.html';
+    // Redirect to index.html
+    window.location.href = './../index.html';
 }
 
 // Attach logout to button if present
