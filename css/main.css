@@ -15,6 +15,9 @@
   --card-bg: rgba(20,22,40,0.92);
   --glass: rgba(30,34,60,0.7);
 }
+html {
+  scroll-behavior: smooth;
+}
 body {
   margin: 0;
   font-family: 'Segoe UI', 'Montserrat', 'Roboto', sans-serif;
