@@ -106,6 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const devices = await fetchDevicesFromFirestore();
+            console.log("Devices fetched for grid:", devices); // <-- Add this line
             deviceGrid.innerHTML = '';
             if (devices.length === 0) {
                 deviceGrid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; color:#888; font-size:1.1rem;">No devices found. Click "Add New Device" to get started!</div>`;
@@ -113,18 +114,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             devices.forEach((device, index) => {
                 deviceGrid.innerHTML += `
-                  <div class="device-card" style="cursor:pointer;" onclick="viewDeviceDetails('${device.deviceName}')">
-                    <h3>${device.deviceName}</h3>
-                    <p><span class="status-dot ${device.status ? 'on' : 'off'}"></span>
-                      <strong>Status:</strong> <span id="status-text-${index}">${device.status ? 'On' : 'Off'}</span>
-                    </p>
-                    <p><strong>Room:</strong> ${device.room}</p>
-                    <p><strong>Home:</strong> ${device.home || ''}</p>
-                    <button onclick="event.stopPropagation();changeDeviceStatus('${device.deviceName}', ${device.status ? 'false' : 'true'}, ${index})">
-                      Turn ${device.status ? 'Off' : 'On'}
-                    </button>
-                  </div>
-                `;
+  <div class="device-card" style="cursor:pointer;" onclick="viewDeviceDetails('${device.deviceName}')">
+    <h3>${device.deviceName}</h3>
+    <p><span class="status-dot ${device.status ? 'on' : 'off'}"></span>
+      <strong>Status:</strong> <span id="status-text-${index}">${device.status ? 'On' : 'Off'}</span>
+    </p>
+    <p><strong>Room:</strong> ${device.room}</p>
+    <p><strong>Home:</strong> ${device.home || ''}</p>
+    <button onclick="event.stopPropagation();changeDeviceStatus('${device.deviceName}', ${device.status ? 'false' : 'true'}, ${index})">
+      Turn ${device.status ? 'Off' : 'On'}
+    </button>
+  </div>
+`;
             });
         } catch (err) {
             console.error("Error rendering devices:", err);
