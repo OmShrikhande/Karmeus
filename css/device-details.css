@@ -1,0 +1,210 @@
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 2em;
+    min-height: 100vh;
+    background: var(--bg-gradient, linear-gradient(120deg, #f8fafc 0%, #e0e7ef 100%));
+    transition: background 0.6s;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Animated flowing rectangles */
+.bg-anim-rect {
+    position: fixed;
+    width: 480px;
+    height: 140px;
+    background: linear-gradient(100deg, #232946 60%, #4f8cff 100%);
+    opacity: 0.18;
+    border-radius: 36px;
+    z-index: 0;
+    top: -80px;
+    right: -200px;
+    transform: rotate(18deg);
+    animation: flowRect1 12s ease-in-out infinite alternate;
+    filter: blur(2.5px);
+    pointer-events: none;
+    box-shadow: 0 8px 40px 8px #23294655;
+}
+
+.bg-anim-rect2 {
+    position: fixed;
+    width: 380px;
+    height: 110px;
+    background: linear-gradient(100deg, #6ad1ff 40%, #232946 100%);
+    opacity: 0.13;
+    border-radius: 32px;
+    z-index: 0;
+    bottom: -60px;
+    left: -160px;
+    transform: rotate(-12deg);
+    animation: flowRect2 14s ease-in-out infinite alternate-reverse;
+    filter: blur(2px);
+    pointer-events: none;
+    box-shadow: 0 8px 40px 8px #6ad1ff55;
+}
+
+@keyframes flowRect1 {
+    0%   { top: -80px; right: -200px; transform: rotate(18deg) scale(1);}
+    40%  { top: 30vh; right: 30vw; transform: rotate(12deg) scale(1.08);}
+    60%  { top: 60vh; right: 60vw; transform: rotate(24deg) scale(1.12);}
+    100% { top: 80vh; right: 80vw; transform: rotate(10deg) scale(1);}
+}
+@keyframes flowRect2 {
+    0%   { bottom: -60px; left: -160px; transform: rotate(-12deg) scale(1);}
+    40%  { bottom: 30vh; left: 30vw; transform: rotate(-18deg) scale(1.09);}
+    60%  { bottom: 60vh; left: 60vw; transform: rotate(-8deg) scale(1.13);}
+    100% { bottom: 80vh; left: 80vw; transform: rotate(-20deg) scale(1);}
+}
+
+.theme-toggle-btn {
+    position: fixed;
+    top: 24px;
+    right: 32px;
+    z-index: 10;
+    padding: 0.6em 1.6em;
+    border: none;
+    border-radius: 24px;
+    background: linear-gradient(90deg, #232946 40%, #6ad1ff 100%);
+    color: #fff;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(60, 90, 130, 0.10);
+    transition: background 0.3s, transform 0.2s;
+    outline: none;
+}
+.theme-toggle-btn:hover {
+    background: linear-gradient(90deg, #6ad1ff 40%, #232946 100%);
+    transform: scale(1.07);
+}
+
+.card {
+    border: 1px solid #b3c0d1;
+    border-radius: 20px;
+    padding: 2em 2.5em;
+    max-width: 540px;
+    margin: 70px auto 0 auto;
+    background: rgba(255,255,255,0.93);
+    box-shadow: 0 8px 32px rgba(60, 90, 130, 0.16);
+    animation: fadeInCard 0.8s cubic-bezier(.4,0,.2,1);
+    transition: box-shadow 0.3s, background 0.5s;
+    position: relative;
+    z-index: 1;
+    backdrop-filter: blur(2px);
+}
+
+.card:hover {
+    box-shadow: 0 16px 40px rgba(60, 90, 130, 0.22);
+    transform: translateY(-4px) scale(1.02);
+    transition: box-shadow 0.3s, transform 0.3s;
+}
+
+@keyframes fadeInCard {
+    from { opacity: 0; transform: translateY(40px) scale(0.95);}
+    to   { opacity: 1; transform: translateY(0) scale(1);}
+}
+
+h2 {
+    text-align: center;
+    color: grey;
+    margin-bottom: 1.5em;
+    letter-spacing: 1px;
+    animation: fadeInTitle 0.7s 0.1s backwards;
+    font-size: 2.1em;
+    font-weight: 700;
+}
+
+@keyframes fadeInTitle {
+    from { opacity: 0; transform: translateY(-20px);}
+    to   { opacity: 1; transform: translateY(0);}
+}
+
+.field {
+    margin-bottom: 1.2em;
+    padding: 0.7em 1em;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #f0f4fa 60%, #e6ecf5 100%);
+    box-shadow: 0 1px 4px rgba(60, 90, 130, 0.04);
+    opacity: 0;
+    transform: translateX(-30px);
+    animation: fadeInField 0.5s forwards;
+    animation-delay: calc(0.2s + var(--i, 0) * 0.08s);
+    transition: background 0.3s;
+    font-size: 1.08em;
+}
+
+.field:hover {
+    background: linear-gradient(90deg, #e6ecf5 60%, #f0f4fa 100%);
+}
+
+.label {
+    font-weight: bold;
+    color: #232946;
+    margin-right: 0.5em;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 2px #fff;
+}
+
+button:not(.theme-toggle-btn) {
+    display: block;
+    margin: 2em auto 0 auto;
+    padding: 0.7em 2.2em;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #232946 40%, #6ad1ff 100%);
+    color: #fff;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(60, 90, 130, 0.10);
+    transition: background 0.3s, transform 0.2s;
+    outline: none;
+}
+
+button:not(.theme-toggle-btn):hover {
+    background: linear-gradient(90deg, #6ad1ff 40%, #232946 100%);
+    transform: scale(1.05);
+}
+
+@keyframes fadeInField {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Dark Theme */
+body.dark {
+    --bg-gradient: linear-gradient(120deg, #16161a 0%, #232946 100%);
+    color: #eaeaea;
+}
+body.dark .card {
+    background: rgba(35,41,70,0.97);
+    border-color: #6ad1ff;
+    color: #eaeaea;
+}
+body.dark .field {
+    background: linear-gradient(90deg, #232946 60%, #16161a 100%);
+    box-shadow: 0 1px 4px rgba(30, 40, 60, 0.10);
+}
+body.dark .label {
+    color: #6ad1ff;
+    text-shadow: none;
+}
+body.dark .bg-anim-rect {
+    background: linear-gradient(100deg, #6ad1ff 60%, #232946 100%);
+    opacity: 0.22;
+}
+body.dark .bg-anim-rect2 {
+    background: linear-gradient(100deg, #232946 40%, #6ad1ff 100%);
+    opacity: 0.16;
+}
+body.dark button,
+body.dark .theme-toggle-btn {
+    background: linear-gradient(90deg, #232946 40%, #4f8cff 100%);
+    color: #fff;
+}
+body.dark button:hover,
+body.dark .theme-toggle-btn:hover {
+    background: linear-gradient(90deg, #4f8cff 40%, #232946 100%);
+}

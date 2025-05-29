@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Device Details</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../css/device-details.css">
+    <!-- Firebase scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="../js/FirebseConfig.js"></script>
+</head>
+<body>
+    <div class="bg-anim-rect"></div>
+    <div class="bg-anim-rect2"></div>
+    <button class="theme-toggle-btn" id="themeToggleBtn">Toggle Theme</button>
+
+    <form class="card" id="deviceDetailsForm" autocomplete="off">
+        <h2 id="deviceTitle">Device Details</h2>
+        <div id="fieldsContainer"></div>
+        <div id="formMessage" style="margin-top:1em; color:#e74c3c; text-align:center;"></div>
+        <div style="display:flex;justify-content:center;gap:1em;">
+            <button type="button" id="editBtn">Edit</button>
+            <button type="submit" id="saveBtn" style="display:none;">Save Changes</button>
+            <button type="button" id="cancelBtn" style="display:none;">Cancel</button>
+        </div>
+    </form>
+    <button onclick="window.history.back()">Back</button>
+
+    <script>
+    let originalDevice = {};
+    let deviceName = '';
+    let userCollection = '';
+    let isEditing = false;
+
+    async function loadDeviceDetails() {
+        deviceName = localStorage.getItem('selectedDeviceName');
+        userCollection = localStorage.getItem('currentUserEmailHash');
+        const fieldsContainer = document.getElementById('fieldsContainer');
+        const deviceTitle = document.getElementById('deviceTitle');
+        const formMessage = document.getElementById('formMessage');
+        if (!deviceName || !userCollection) {
+            fieldsContainer.innerHTML = "<div style='color:red;'>Device or user not found.</div>";
+            document.getElementById('editBtn').disabled = true;
+            return;
+        }
+        try {
+            const doc = await firestore.collection(userCollection).doc(deviceName).get();
+            if (!doc.exists) {
+                fieldsContainer.innerHTML = "<div style='color:red;'>Device not found in database.</div>";
+                document.getElementById('editBtn').disabled = true;
+                return;
+            }
+            const device = doc.data();
+            originalDevice = {...device}; // Save for comparison
+            deviceTitle.textContent = device.deviceName || deviceName;
+            renderFields(device, false);
+            formMessage.textContent = '';
+            document.getElementById('editBtn').disabled = false;
+        } catch (err) {
+            fieldsContainer.innerHTML = "<div style='color:red;'>Error loading device details.</div>";
+            document.getElementById('editBtn').disabled = true;
+            console.error(err);
+        }
+    }
+
+    function renderFields(device, editable) {
+        const fieldsContainer = document.getElementById('fieldsContainer');
+        let i = 0;
+        let html = '';
+        for (const key in device) {
+            // Skip deviceName and appkey fields
+            if (key === 'deviceName' || key.toLowerCase() === 'appkey' || key.toLowerCase() === 'app_key') continue;
+            const value = device[key];
+            const type = typeof value;
+            if (editable) {
+                if (type === "boolean") {
+                    html += `<div class="field" style="--i:${i++}">
+                        <span class="label">${key}:</span>
+                        <input type="checkbox" name="${key}" ${value ? "checked" : ""} />
+                    </div>`;
+                } else if (type === "number") {
+                    html += `<div class="field" style="--i:${i++}">
+                        <span class="label">${key}:</span>
+                        <input type="number" name="${key}" value="${value}" />
+                    </div>`;
+                } else {
+                    html += `<div class="field" style="--i:${i++}">
+                        <span class="label">${key}:</span>
+                        <input type="text" name="${key}" value="${value ?? ''}" />
+                    </div>`;
+                }
+            } else {
+                html += `<div class="field" style="--i:${i++}">
+                    <span class="label">${key}:</span>
+                    <span style="padding:0.5em 0.8em;display:inline-block;">${type === "boolean" ? (value ? "True" : "False") : value ?? ''}</span>
+                </div>`;
+            }
+        }
+        fieldsContainer.innerHTML = html;
+    }
+
+    document.getElementById('editBtn').addEventListener('click', function() {
+        isEditing = true;
+        renderFields(originalDevice, true);
+        document.getElementById('editBtn').style.display = 'none';
+        document.getElementById('saveBtn').style.display = '';
+        document.getElementById('cancelBtn').style.display = '';
+        document.getElementById('formMessage').textContent = '';
+    });
+
+    document.getElementById('cancelBtn').addEventListener('click', function() {
+        isEditing = false;
+        renderFields(originalDevice, false);
+        document.getElementById('editBtn').style.display = '';
+        document.getElementById('saveBtn').style.display = 'none';
+        document.getElementById('cancelBtn').style.display = 'none';
+        document.getElementById('formMessage').textContent = '';
+    });
+
+    document.getElementById('deviceDetailsForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        if (!isEditing) return;
+        const form = e.target;
+        const formMessage = document.getElementById('formMessage');
+        let updateData = {};
+        let typeError = false;
+        let errorField = "";
+        // Loop through originalDevice keys to ensure all fields are checked
+        for (const key in originalDevice) {
+            if (key === 'deviceName' || key.toLowerCase() === 'appkey' || key.toLowerCase() === 'app_key') continue;
+            const originalValue = originalDevice[key];
+            const type = typeof originalValue;
+            if (type === "boolean") {
+                // For checkboxes, use form.elements and check .checked
+                const checked = form.elements[key] ? form.elements[key].checked : false;
+                updateData[key] = checked;
+            } else if (type === "number") {
+                const value = form.elements[key] ? form.elements[key].value : "";
+                if (value === "" || isNaN(value)) {
+                    typeError = true;
+                    errorField = key;
+                    break;
+                }
+                updateData[key] = Number(value);
+            } else if (type === "string") {
+                const value = form.elements[key] ? form.elements[key].value : "";
+                updateData[key] = value;
+            } else {
+                // fallback for other types
+                const value = form.elements[key] ? form.elements[key].value : "";
+                updateData[key] = value;
+            }
+        }
+
+        if (typeError) {
+            formMessage.style.color = "#e74c3c";
+            formMessage.textContent = `Please enter a valid number for "${errorField}".`;
+            return;
+        }
+
+        formMessage.style.color = "#888";
+        formMessage.textContent = "Saving...";
+        try {
+            await firestore.collection(userCollection).doc(deviceName).update(updateData);
+            formMessage.style.color = "#27ae60";
+            formMessage.textContent = "Device details updated successfully!";
+            isEditing = false;
+            setTimeout(() => {
+                loadDeviceDetails();
+                document.getElementById('editBtn').style.display = '';
+                document.getElementById('saveBtn').style.display = 'none';
+                document.getElementById('cancelBtn').style.display = 'none';
+            }, 1000);
+        } catch (err) {
+            formMessage.style.color = "#e74c3c";
+            formMessage.textContent = "Failed to update device details.";
+            console.error(err);
+        }
+    });
+
+    loadDeviceDetails();
+    </script>
+    <script>
+    const themeBtn = document.getElementById('themeToggleBtn');
+    function setTheme(dark) {
+        document.body.classList.toggle('dark', dark);
+        localStorage.setItem('deviceDetailsTheme', dark ? 'dark' : 'light');
+    }
+    themeBtn.onclick = () => setTheme(!document.body.classList.contains('dark'));
+    window.onload = () => {
+        const saved = localStorage.getItem('deviceDetailsTheme');
+        setTheme(saved === 'dark');
+    };
+    </script>
+</body>
+</html>

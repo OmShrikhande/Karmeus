@@ -13,6 +13,7 @@
   <script src="../js/home.js"></script>
 </head>
 <body>
+  <canvas id="bg-canvas" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-1;"></canvas>
   <header class="sticky-header">
     <span class="site-title">MySite</span>
     <div class="header-actions">
@@ -40,6 +41,69 @@
       <span id="developerCredit" style="font-size:1em; color:#666;">Developed by Om Shrikhande</span>
     </p>
   </footer>
+  <!-- Place this script at the end of your <body> -->
+<script>
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
 
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+let mouseX = canvas.width / 2;
+window.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+});
+
+// Soft pastel gradients for each wave
+function getWaveGradient(yOffset, amp) {
+    const grad = ctx.createLinearGradient(0, yOffset - amp, canvas.width, yOffset + amp);
+    grad.addColorStop(0, "rgba(120,170,255,0.18)");
+    grad.addColorStop(0.5, "rgba(180,140,255,0.22)");
+    grad.addColorStop(1, "rgba(120,255,255,0.18)");
+    return grad;
+}
+
+function drawSineWave(yOffset, amp, freq, phase, thickness, glow) {
+    ctx.save();
+    ctx.beginPath();
+    for (let x = 0; x <= canvas.width; x += 2) {
+        // Add a little random "jitter" for organic look
+        let t = (x / canvas.width) * Math.PI * 2 * freq + phase;
+        let y = yOffset + Math.sin(t) * amp * Math.sin(phase + x * 0.002) + Math.sin(t*2 + phase)*2;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = getWaveGradient(yOffset, amp);
+    ctx.shadowColor = "rgba(180,140,255,0.25)";
+    ctx.shadowBlur = glow;
+    ctx.lineWidth = thickness;
+    ctx.globalAlpha = 0.8;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    ctx.restore();
+}
+
+function animate(time) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // MouseX controls frequency and amplitude
+    let freqBase = 1.5 + (mouseX / canvas.width) * 2.5;
+    let ampBase = 60 + (mouseX / canvas.width) * 80;
+    for (let i = 0; i < 18; i++) {
+        let yOffset = canvas.height * (0.3 + 0.15 * i);
+        let amp = ampBase * (0.7 + 0.2 * i);
+        let freq = freqBase + i * 0.5;
+        let phase = time * 0.001 * (0.7 + i * 0.2) + i;
+        let thickness = 4 + 1.5 * Math.sin(time * 0.001 + i);
+        let glow = 18 + 6 * Math.sin(time * 0.001 + i * 2);
+        drawSineWave(yOffset, amp, freq, phase, thickness, glow);
+    }
+    requestAnimationFrame(animate);
+}
+animate(0);
+</script>
 </body>
 </html>

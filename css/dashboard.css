@@ -1,7 +1,7 @@
 /* Root theme variables */
 :root {
   --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #f5f7fa 100%);
-  --bg-color: #f5f7fa;
+  --bg-color: #fff;
   --text-color: #222;
   --header-bg: #0057ff;
   --header-text: #fff;
@@ -38,7 +38,7 @@
 html, body {
   height: 100%;
   min-height: 100vh;
-  background: var(--bg-gradient);
+  background: transparent;
   color: var(--text-color);
   font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
   margin: 0;

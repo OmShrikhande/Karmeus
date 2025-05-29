@@ -24,8 +24,45 @@
 
   <section class="hero">
     <h1>Welcome to <span class="typewriter" id="siteTitleHero">MySite</span></h1>
-    <p>The one-stop solution for your needs.</p>
+  <div class="typewriter-punchline">
+  <span id="typewriterText"></span>
+  <span class="typewriter-cursor">|</span>
+</div>
   </section>
+
+    <!-- About Us & Company Info Section -->
+<section class="about-section" id="about">
+  <div class="about-cards">
+    <div class="about-card">
+      <h2>🏠 About Us</h2>
+      <p>
+        <strong>EISTAtech</strong> delivers smart automation for homes and businesses. Control appliances via mobile, web, or voice—effortlessly. Our modular, energy-efficient systems fit any need or budget.
+      </p>
+    </div>
+    <div class="about-card">
+      <h2>📜 Company</h2>
+      <p>
+        We design, develop, install, and support smart environments using IoT, AI, and solar tech. One-stop for products, services, and software.
+      </p>
+    </div>
+    <div class="about-card">
+      <h2>🎯 Vision</h2>
+      <blockquote class="vision-quote">
+        Smart automation for every home and business—affordable, accessible, and easy.
+      </blockquote>
+    </div>
+    <div class="about-card">
+      <h2>🌟 Mission</h2>
+      <ul class="mission-list">
+        <li>Custom solutions for every user</li>
+        <li>Promote energy efficiency</li>
+        <li>Simplify life with AI & voice</li>
+        <li>Empower India’s smart future</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
 
   <section class="overview" id="features">
     <div class="card">
@@ -46,42 +83,14 @@
     <div id="formMessage" style="color: red; margin-bottom: 10px;"></div>
     <h2 id="formTitle">Login</h2>
     <form id="authForm">
-      <input type="email" id="email" name="email" placeholder="Email" required />
-      <input type="password" id="password" name="password" placeholder="Password" required />
+      <input type="email" id="email" name="email" maxlength="100" placeholder="Email" required />
+      <input type="password" id="password" name="password" maxlength="100" minlength="6" placeholder="Password" required />
       <div id="signupExtra" style="display: none;">
         <input type="text" id="fullname" name="fullname" placeholder="Full Name" />
         <input type="text" id="username" name="username" placeholder="Username" />
         <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" />
         <input type="tel" id="mobile" name="mobile" placeholder="Mobile Number" />
-        <select id="timezone" name="timezone">
-          <option value="">Select Timezone</option>
-          <option value="Pacific/Midway">(UTC-11:00) Midway Island, Samoa</option>
-          <option value="America/Adak">(UTC-10:00) Hawaii-Aleutian, Honolulu</option>
-          <option value="America/Anchorage">(UTC-09:00) Alaska, Anchorage</option>
-          <option value="America/Los_Angeles">(UTC-08:00) Pacific Time (US & Canada), Los Angeles</option>
-          <option value="America/Denver">(UTC-07:00) Mountain Time (US & Canada), Denver</option>
-          <option value="America/Chicago">(UTC-06:00) Central Time (US & Canada), Chicago</option>
-          <option value="America/New_York">(UTC-05:00) Eastern Time (US & Canada), New York</option>
-          <option value="America/Caracas">(UTC-04:00) Caracas</option>
-          <option value="America/Halifax">(UTC-04:00) Atlantic Time (Canada), Halifax</option>
-          <option value="America/St_Johns">(UTC-03:30) Newfoundland, St. John's</option>
-          <option value="America/Argentina/Buenos_Aires">(UTC-03:00) Buenos Aires</option>
-          <option value="America/Sao_Paulo">(UTC-03:00) Brasilia, Sao Paulo</option>
-          <option value="Atlantic/Azores">(UTC-01:00) Azores</option>
-          <option value="Europe/London">(UTC+00:00) London, Dublin, Lisbon</option>
-          <option value="Europe/Berlin">(UTC+01:00) Berlin, Rome, Paris, Madrid</option>
-          <option value="Europe/Athens">(UTC+02:00) Athens, Bucharest, Istanbul</option>
-          <option value="Europe/Moscow">(UTC+03:00) Moscow, St. Petersburg</option>
-          <option value="Asia/Dubai">(UTC+04:00) Abu Dhabi, Dubai</option>
-          <option value="Asia/Karachi">(UTC+05:00) Islamabad, Karachi</option>
-          <option value="Asia/Kolkata">(UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi</option>
-          <option value="Asia/Dhaka">(UTC+06:00) Dhaka</option>
-          <option value="Asia/Bangkok">(UTC+07:00) Bangkok, Hanoi, Jakarta</option>
-          <option value="Asia/Hong_Kong">(UTC+08:00) Beijing, Hong Kong, Singapore</option>
-          <option value="Asia/Tokyo">(UTC+09:00) Osaka, Sapporo, Tokyo</option>
-          <option value="Australia/Sydney">(UTC+10:00) Sydney, Melbourne, Brisbane</option>
-          <option value="Pacific/Auckland">(UTC+12:00) Auckland, Wellington</option>
-        </select>
+        <select id="timezone" name="timezone"></select>
         <select id="temperatureScale" name="temperatureScale">
           <option value="">Select Temperature Scale</option>
           <option value="celsius">Celsius (°C)</option>
@@ -94,11 +103,109 @@
     <span class="toggle-link" onclick="toggleForm()">Don't have an account? Sign up</span>
   </section>
 
+
+  <blockquote class="anime-quote">
+    <span>“I am the hope of the universe. I am the answer to all living things that cry out for peace.”</span>
+    <br>
+    <span class="anime-quote-author">— Goku, <em>Dragon Ball Z</em></span>
+  </blockquote>
+
+
   <footer id="contact">
     <p>
       &copy; <span id="companyYear"></span> <span id="companyName">Your Company</span>. Made with ❤️ by <span id="developerName">You</span>.
       Connect on <a href="#">LinkedIn</a> or <a href="#">GitHub</a>
     </p>
   </footer>
+
+  <script>
+const punchlines = [
+  "“I am the hope of the universe.” — Goku, Dragon Ball Z",
+  "“If you don’t take risks, you can’t create a future!” — Luffy, One Piece",
+  "“No one knows what the future holds. That’s why its potential is infinite.” — Okabe, Steins;Gate",
+  "“Whatever you lose, you’ll find it again. But what you throw away you’ll never get back.” — Kenshin, Rurouni Kenshin"
+];
+
+const typewriterText = document.getElementById('typewriterText');
+let lineIndex = 0;
+let charIndex = 0;
+let typing = true;
+
+function typeLine() {
+  if (charIndex <= punchlines[lineIndex].length) {
+    typewriterText.textContent = punchlines[lineIndex].slice(0, charIndex);
+    charIndex++;
+    setTimeout(typeLine, 38); // typing speed
+  } else {
+    typing = false;
+    setTimeout(eraseLine, 1800); // pause before erasing
+  }
+}
+
+function eraseLine() {
+  if (charIndex > 0) {
+    typewriterText.textContent = punchlines[lineIndex].slice(0, charIndex - 1);
+    charIndex--;
+    setTimeout(eraseLine, 18); // erasing speed
+  } else {
+    typing = true;
+    lineIndex = (lineIndex + 1) % punchlines.length;
+    setTimeout(typeLine, 400); // pause before next line
+  }
+}
+
+typeLine();
+
+document.getElementById('authForm').addEventListener('submit', function(e) {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const formMessage = document.getElementById('formMessage');
+
+    // Basic XSS filter (disallow <, >, ", ', and script tags)
+    const xssPattern = /[<>\"\'\/]/;
+    if (xssPattern.test(email) || xssPattern.test(password)) {
+        e.preventDefault();
+        formMessage.textContent = "Invalid characters detected.";
+        return false;
+    }
+
+    // Length check
+    if (email.length > 100 || password.length > 100) {
+        e.preventDefault();
+        formMessage.textContent = "Input too long.";
+        return false;
+    }
+
+    // Basic email format check
+    if (!/^[^@]+@[^@]+\.[^@]+$/.test(email)) {
+        e.preventDefault();
+        formMessage.textContent = "Invalid email format.";
+        return false;
+    }
+
+    // Password minimum length
+    if (password.length < 6) {
+        e.preventDefault();
+        formMessage.textContent = "Password too short.";
+        return false;
+    }
+
+    // Prevent SQL keywords (basic, not foolproof)
+    const sqlPattern = /(select|insert|update|delete|drop|union|--|;)/i;
+    if (sqlPattern.test(email) || sqlPattern.test(password)) {
+        e.preventDefault();
+        formMessage.textContent = "Suspicious input detected.";
+        return false;
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('./src/timezones.html')
+        .then(response => response.text())
+        .then(options => {
+            document.getElementById('timezone').innerHTML = options;
+        });
+});
+</script>
 </body>
 </html>
