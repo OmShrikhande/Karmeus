@@ -20,6 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const userEmail = getCurrentUserEmail();
     if (!userEmail) {
-        window.location.href = "./../main.html";
+        window.location.href = "./../index.html";
     }
 });

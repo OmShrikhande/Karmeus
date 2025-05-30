@@ -378,5 +378,5 @@ async function sha256(message) {
 const userEmail = localStorage.getItem('currentUserEmail') || sessionStorage.getItem('currentUserEmail');
 if (!userEmail) {
     // Not logged in, redirect to login page
-    window.location.href = "./../main.html";
+    window.location.href = "./../index.html";
 }
