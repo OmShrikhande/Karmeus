@@ -22,6 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Fetch username from Firestore based on logged-in user email ---
     function getCurrentUserEmail() {
         return localStorage.getItem('currentUserEmail') || sessionStorage.getItem('currentUserEmail');
+        console.log("Current user email:", localStorage.getItem('currentUserEmail'));
+        console.log("Current user email from session:", sessionStorage.getItem('currentUserEmail'));
     }
 
     async function fetchAndDisplayUsername() {
