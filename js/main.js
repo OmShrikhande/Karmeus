@@ -177,3 +177,4 @@ if (!userEmail) {
     // Not logged in, redirect to login page
     window.location.href = "./main.html";
 }
+
