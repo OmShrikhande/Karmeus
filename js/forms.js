@@ -372,3 +372,11 @@ async function sha256(message) {
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
+
+
+// --- Authentication check ---
+const userEmail = localStorage.getItem('currentUserEmail') || sessionStorage.getItem('currentUserEmail');
+if (!userEmail) {
+    // Not logged in, redirect to login page
+    window.location.href = "./../main.html";
+}

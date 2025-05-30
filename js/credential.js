@@ -200,3 +200,11 @@ function downloadCCode() {
 }
 window.copyCCode = copyCCode;
 window.downloadCCode = downloadCCode;
+
+
+// --- Authentication check ---
+const userEmail = localStorage.getItem('currentUserEmail') || sessionStorage.getItem('currentUserEmail');
+if (!userEmail) {
+    // Not logged in, redirect to login page
+    window.location.href = "./../main.html";
+}

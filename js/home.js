@@ -401,4 +401,11 @@ document.addEventListener('DOMContentLoaded', () => {
         notif.style.opacity = '1';
         setTimeout(() => { notif.style.opacity = '0'; }, 2200);
     }
+
+    // --- Authentication check ---
+    const userEmail = localStorage.getItem('currentUserEmail') || sessionStorage.getItem('currentUserEmail');
+    if (!userEmail) {
+        // Not logged in, redirect to login page
+        window.location.href = "./../main.html";
+    }
 });
