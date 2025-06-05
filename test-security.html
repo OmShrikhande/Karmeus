@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Security Test</title>
+    <script src="./js/security-config.js"></script>
+    <script src="./js/security-utils.js"></script>
+    <script src="./js/security.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .pass { color: green; }
+        .fail { color: red; }
+        .warning { color: orange; }
+        input, textarea { margin: 5px; padding: 5px; width: 300px; }
+        button { margin: 5px; padding: 8px 15px; }
+        #securityLog { max-height: 200px; overflow-y: auto; background: #f5f5f5; padding: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🛡️ Comprehensive Security System Test</h1>
+    
+    <div class="test-section">
+        <h2>Core Security Features</h2>
+        <div id="coreResults"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Input Validation Test</h2>
+        <p>Try entering malicious content in the fields below:</p>
+        <input type="text" placeholder="Try: <script>alert('xss')</script>" id="testInput1"><br>
+        <input type="text" placeholder="Try: ' OR 1=1 --" id="testInput2"><br>
+        <textarea placeholder="Try: javascript:alert('test')" id="testTextarea"></textarea><br>
+        <button onclick="testInputValidation()">Test Input Validation</button>
+        <div id="inputResults"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Rate Limiting Test</h2>
+        <button onclick="testRateLimit()">Click rapidly to test rate limiting</button>
+        <div id="rateLimitResults"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Device Fingerprinting</h2>
+        <button onclick="testFingerprinting()">Generate Device Fingerprint</button>
+        <div id="fingerprintResults"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Behavioral Analysis</h2>
+        <p>Move your mouse around and type to generate behavioral data</p>
+        <button onclick="testBehavior()">Analyze Behavior</button>
+        <div id="behaviorResults"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Security Log</h2>
+        <button onclick="refreshSecurityLog()">Refresh Log</button>
+        <button onclick="clearSecurityLog()">Clear Log</button>
+        <div id="securityLog"></div>
+    </div>
+    
+    <script>
+        let clickCount = 0;
+        let lastClickTime = 0;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            runCoreTests();
+            refreshSecurityLog();
+            
+            // Auto-refresh log every 10 seconds
+            setInterval(refreshSecurityLog, 10000);
+        });
+        
+        function runCoreTests() {
+            const results = document.getElementById('coreResults');
+            let html = '';
+            
+            // Test if security manager loads
+            if (window.securityManager) {
+                html += '<p class="pass">✅ Security Manager loaded successfully</p>';
+                
+                // Test email validation
+                const testEmail = 'test@example.com';
+                const isValidEmail = window.securityManager.validateEmail(testEmail);
+                html += `<p class="${isValidEmail ? 'pass' : 'fail'}">✅ Email validation: ${isValidEmail ? 'PASS' : 'FAIL'}</p>`;
+                
+                // Test password validation
+                const testPassword = 'TestPass123!';
+                const passwordValidation = window.securityManager.validatePassword(testPassword);
+                html += `<p class="${passwordValidation.isValid ? 'pass' : 'fail'}">✅ Password validation: ${passwordValidation.isValid ? 'PASS' : 'FAIL'}</p>`;
+                
+                // Test input sanitization
+                const dangerousInput = '<script>alert("xss")</script>Hello';
+                const sanitized = window.securityManager.sanitizeInput(dangerousInput);
+                html += `<p class="${sanitized === 'Hello' ? 'pass' : 'fail'}">✅ Input sanitization: ${sanitized === 'Hello' ? 'PASS' : 'FAIL'}</p>`;
+                
+                // Test CSRF token generation
+                const token = window.securityManager.generateCSRFToken();
+                html += `<p class="${token && token.length > 0 ? 'pass' : 'fail'}">✅ CSRF token generation: ${token && token.length > 0 ? 'PASS' : 'FAIL'}</p>`;
+                
+                // Test SecurityUtils
+                if (window.SecurityUtils) {
+                    html += '<p class="pass">✅ Security Utils loaded successfully</p>';
+                    
+                    // Test threat detection
+                    const sqlTest = SecurityUtils.detectSQLInjection("' OR 1=1 --");
+                    html += `<p class="${sqlTest ? 'pass' : 'fail'}">✅ SQL Injection detection: ${sqlTest ? 'PASS' : 'FAIL'}</p>`;
+                    
+                    const xssTest = SecurityUtils.detectXSS('<script>alert("test")</script>');
+                    html += `<p class="${xssTest ? 'pass' : 'fail'}">✅ XSS detection: ${xssTest ? 'PASS' : 'FAIL'}</p>`;
+                } else {
+                    html += '<p class="fail">❌ Security Utils failed to load</p>';
+                }
+                
+                // Test configuration
+                if (window.SECURITY_CONFIG) {
+                    html += '<p class="pass">✅ Security Configuration loaded</p>';
+                } else {
+                    html += '<p class="warning">⚠️ Security Configuration not found</p>';
+                }
+                
+                html += '<p class="pass"><strong>Core security tests completed! 🎉</strong></p>';
+            } else {
+                html += '<p class="fail">❌ Security Manager failed to load</p>';
+            }
+            
+            results.innerHTML = html;
+        }
+        
+        function testInputValidation() {
+            const input1 = document.getElementById('testInput1').value;
+            const input2 = document.getElementById('testInput2').value;
+            const textarea = document.getElementById('testTextarea').value;
+            const results = document.getElementById('inputResults');
+            
+            let html = '<h3>Input Validation Results:</h3>';
+            
+            if (window.securityManager) {
+                [input1, input2, textarea].forEach((input, index) => {
+                    if (input) {
+                        const validation = window.securityManager.validateInput(input);
+                        html += `<p class="${validation.isValid ? 'pass' : 'fail'}">
+                            Input ${index + 1}: ${validation.isValid ? 'SAFE' : 'BLOCKED'} 
+                            ${validation.threats.length > 0 ? '(Threats: ' + validation.threats.join(', ') + ')' : ''}
+                        </p>`;
+                    }
+                });
+            }
+            
+            results.innerHTML = html;
+        }
+        
+        function testRateLimit() {
+            const now = Date.now();
+            clickCount++;
+            
+            if (now - lastClickTime < 100) { // Rapid clicking
+                const results = document.getElementById('rateLimitResults');
+                
+                if (window.securityManager) {
+                    const allowed = window.securityManager.checkRateLimit('test-user');
+                    results.innerHTML = `<p class="${allowed ? 'warning' : 'pass'}">
+                        Click ${clickCount}: ${allowed ? 'ALLOWED' : 'RATE LIMITED'} 
+                        (${now - lastClickTime}ms since last click)
+                    </p>`;
+                }
+            }
+            
+            lastClickTime = now;
+        }
+        
+        function testFingerprinting() {
+            const results = document.getElementById('fingerprintResults');
+            
+            if (window.SecurityUtils) {
+                const fingerprint = SecurityUtils.generateDeviceFingerprint();
+                results.innerHTML = `
+                    <h3>Device Fingerprint Generated:</h3>
+                    <p><strong>Fingerprint:</strong> ${fingerprint.substring(0, 50)}...</p>
+                    <p><strong>Length:</strong> ${fingerprint.length} characters</p>
+                    <p class="pass">✅ Device fingerprinting working</p>
+                `;
+            } else {
+                results.innerHTML = '<p class="fail">❌ SecurityUtils not available</p>';
+            }
+        }
+        
+        function testBehavior() {
+            const results = document.getElementById('behaviorResults');
+            
+            if (window.securityManager && window.securityManager.behaviorTracker) {
+                const tracker = window.securityManager.behaviorTracker;
+                results.innerHTML = `
+                    <h3>Behavioral Data:</h3>
+                    <p><strong>Mouse movements:</strong> ${tracker.mouseMovements.length}</p>
+                    <p><strong>Keystrokes:</strong> ${tracker.keystrokes.length}</p>
+                    <p><strong>Scroll events:</strong> ${tracker.scrollPatterns.length}</p>
+                    <p><strong>Click events:</strong> ${tracker.clickPatterns.length}</p>
+                    <p class="pass">✅ Behavioral tracking active</p>
+                `;
+                
+                // Trigger analysis
+                window.securityManager.analyzeBehavior();
+            } else {
+                results.innerHTML = '<p class="warning">⚠️ Behavioral tracking not initialized</p>';
+            }
+        }
+        
+        function refreshSecurityLog() {
+            const logDiv = document.getElementById('securityLog');
+            const securityLog = JSON.parse(localStorage.getItem('securityLog') || '[]');
+            
+            if (securityLog.length === 0) {
+                logDiv.innerHTML = '<p>No security events logged yet.</p>';
+                return;
+            }
+            
+            const recentEvents = securityLog.slice(-10).reverse(); // Last 10 events
+            let html = '<h3>Recent Security Events:</h3>';
+            
+            recentEvents.forEach(event => {
+                const time = new Date(event.timestamp).toLocaleTimeString();
+                html += `
+                    <div style="margin: 5px 0; padding: 5px; background: white; border-left: 3px solid #007bff;">
+                        <strong>${event.type}</strong> at ${time}<br>
+                        <small>${JSON.stringify(event).substring(0, 100)}...</small>
+                    </div>
+                `;
+            });
+            
+            logDiv.innerHTML = html;
+        }
+        
+        function clearSecurityLog() {
+            localStorage.removeItem('securityLog');
+            refreshSecurityLog();
+            alert('Security log cleared');
+        }
+    </script>
+</body>
+</html>

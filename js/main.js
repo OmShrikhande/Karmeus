@@ -55,12 +55,18 @@ function showMessage(msg, color = "red") {
   el.style.color = color;
 }
 
-// Simulated backend auth handler
+// Enhanced secure auth handler
 document.addEventListener("DOMContentLoaded", function () {
   const authForm = document.getElementById("authForm");
   if (authForm) {
     authForm.addEventListener("submit", async function (e) {
       e.preventDefault();
+      
+      // Security check: Use security manager for form validation
+      if (window.securityManager && !window.securityManager.secureFormSubmit(authForm)) {
+        return;
+      }
+      
       const email = document.getElementById("email").value.trim().toLowerCase();
       const password = document.getElementById("password").value;
       const name = document.getElementById("fullname") ? document.getElementById("fullname").value : "";
@@ -69,6 +75,33 @@ document.addEventListener("DOMContentLoaded", function () {
       const mobile = document.getElementById("mobile") ? document.getElementById("mobile").value : "";
       const timezone = document.getElementById("timezone") ? document.getElementById("timezone").value : "";
       const temperatureScale = document.getElementById("temperatureScale") ? document.getElementById("temperatureScale").value : "";
+
+      // Security validations (if security manager is available)
+      if (window.securityManager) {
+        if (!window.securityManager.validateEmail(email)) {
+          showMessage("Please enter a valid email address!");
+          return;
+        }
+        
+        const passwordValidation = window.securityManager.validatePassword(password);
+        if (!passwordValidation.isValid && isSignup) {
+          let errorMsg = "Password must contain: ";
+          const missing = [];
+          if (!passwordValidation.requirements.minLength) missing.push("8+ characters");
+          if (!passwordValidation.requirements.hasUpperCase) missing.push("uppercase letter");
+          if (!passwordValidation.requirements.hasLowerCase) missing.push("lowercase letter");
+          if (!passwordValidation.requirements.hasNumbers) missing.push("number");
+          if (!passwordValidation.requirements.hasSpecialChar) missing.push("special character");
+          showMessage(errorMsg + missing.join(", "));
+          return;
+        }
+        
+        // Check account lockout
+        if (window.securityManager.isAccountLocked(email)) {
+          showMessage("Account temporarily locked due to too many failed login attempts. Please try again later.");
+          return;
+        }
+      }
 
       const passwordHash = await sha256(password);
 
@@ -105,6 +138,22 @@ document.addEventListener("DOMContentLoaded", function () {
         const emailHash = await sha256(email);
         localStorage.setItem('currentUserEmail', email);
         localStorage.setItem('currentUserEmailHash', emailHash);
+        
+        // Create secure session
+        const sessionData = {
+          email: email,
+          loginTime: Date.now(),
+          lastActivity: Date.now(),
+          sessionId: window.securityManager ? window.securityManager.generateCSRFToken() : 'fallback-' + Date.now()
+        };
+        localStorage.setItem('userSession', JSON.stringify(sessionData));
+        
+        // Track successful signup (if security manager available)
+        if (window.securityManager) {
+          window.securityManager.trackLoginAttempt(email, true);
+          window.securityManager.logSecurityEvent('USER_SIGNUP', { email });
+        }
+        
         alert(`Signup successful! Welcome, ${name}`);
         document.getElementById("authForm").reset();
         window.location.href = "./src/forms.html";
@@ -118,17 +167,40 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         const userData = doc.data();
         if (userData.passwordHash !== passwordHash) {
+          // Track failed login attempt (if security manager available)
+          if (window.securityManager) {
+            window.securityManager.trackLoginAttempt(email, false);
+            window.securityManager.logSecurityEvent('LOGIN_FAILED', { email, reason: 'incorrect_password' });
+          }
           showMessage("Incorrect password!");
           return;
         }
+        
         // Update last login timestamp
         await userRef.update({
           lastLogin: firebase.firestore.FieldValue.serverTimestamp()
         });
+        
         const emailHash = await sha256(email);
         localStorage.setItem('currentUserEmail', email);
         localStorage.setItem('currentUserEmailHash', emailHash);
-        alert(`Login successful! Welcome back, ${email}`);
+        
+        // Create secure session
+        const sessionData = {
+          email: email,
+          loginTime: Date.now(),
+          lastActivity: Date.now(),
+          sessionId: window.securityManager ? window.securityManager.generateCSRFToken() : 'fallback-' + Date.now()
+        };
+        localStorage.setItem('userSession', JSON.stringify(sessionData));
+        
+        // Track successful login (if security manager available)
+        if (window.securityManager) {
+          window.securityManager.trackLoginAttempt(email, true);
+          window.securityManager.logSecurityEvent('LOGIN_SUCCESS', { email });
+        }
+        
+        alert(`Login successful! Welcome back, ${userData.name || email}`);
         document.getElementById("authForm").reset();
         window.location.href = "./src/home.html";
       }

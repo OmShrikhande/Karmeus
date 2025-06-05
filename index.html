@@ -9,6 +9,9 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="./js/FirebaseConfig.js"></script>
+  <script src="./js/security-config.js"></script>
+  <script src="./js/security-utils.js"></script>
+  <script src="./js/security.js"></script>
   <script src="./js/main.js"></script>
 </head>
 <body>
@@ -201,9 +204,37 @@ document.getElementById('authForm').addEventListener('submit', function(e) {
 
 document.addEventListener('DOMContentLoaded', function() {
     fetch('./src/timezones.html')
-        .then(response => response.text())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.text();
+        })
         .then(options => {
-            document.getElementById('timezone').innerHTML = options;
+            const timezoneSelect = document.getElementById('timezone');
+            if (timezoneSelect) {
+                timezoneSelect.innerHTML = options;
+            }
+        })
+        .catch(error => {
+            console.warn('Could not load timezones:', error);
+            // Fallback: add basic timezone options
+            const timezoneSelect = document.getElementById('timezone');
+            if (timezoneSelect) {
+                timezoneSelect.innerHTML = `
+                    <option value="">Select Timezone</option>
+                    <option value="UTC">UTC</option>
+                    <option value="America/New_York">Eastern Time</option>
+                    <option value="America/Chicago">Central Time</option>
+                    <option value="America/Denver">Mountain Time</option>
+                    <option value="America/Los_Angeles">Pacific Time</option>
+                    <option value="Europe/London">London</option>
+                    <option value="Europe/Paris">Paris</option>
+                    <option value="Asia/Tokyo">Tokyo</option>
+                    <option value="Asia/Shanghai">Shanghai</option>
+                    <option value="Asia/Kolkata">India</option>
+                `;
+            }
         });
 });
 </script>

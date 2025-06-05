@@ -349,6 +349,119 @@ header .theme-toggle:hover {
   }
 }
 
+/* Device Count Section */
+.device-count-section {
+  background: var(--card-bg);
+  padding: 2rem;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.device-count-section h2 {
+  margin-top: 0;
+  color: var(--primary);
+  text-align: center;
+}
+
+#generateDevicesBtn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+#generateDevicesBtn:hover {
+  background: var(--button-hover-bg);
+}
+
+/* Device Tabs */
+.device-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--input-border);
+  padding-bottom: 0.5rem;
+}
+
+.device-tab {
+  padding: 0.5rem 1rem;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 5px 5px 0 0;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.device-tab:hover {
+  background: var(--card-bg);
+}
+
+.device-tab.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* Device Content */
+.device-content {
+  min-height: 300px;
+}
+
+.device-panel {
+  display: none;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.device-panel.active {
+  display: flex;
+}
+
+/* WiFi Configuration specific styles */
+#step3 .form-group {
+  flex: 1 1 calc(50% - 1rem);
+}
+
+#step3 .form-group:last-child {
+  flex: 1 1 100%;
+}
+
+/* Submit button styling */
+#submitBtn {
+  background: #27ae60;
+  color: white;
+}
+
+#submitBtn:hover {
+  background: #219a52;
+}
+
+@media (max-width: 768px) {
+  .device-tabs {
+    justify-content: center;
+  }
+  
+  .device-tab {
+    flex: 1;
+    text-align: center;
+    min-width: 80px;
+  }
+  
+  #step3 .form-group {
+    flex: 1 1 100%;
+  }
+}
+
 @media (max-width: 600px) {
   .form-container {
     padding: 1.2rem 0.5rem;
@@ -363,5 +476,17 @@ header .theme-toggle:hover {
   .form-navigation button {
     padding: 0.6rem 1rem;
     font-size: 1rem;
+  }
+  
+  .device-count-section {
+    padding: 1rem;
+  }
+  
+  .device-tabs {
+    flex-direction: column;
+  }
+  
+  .device-tab {
+    flex: none;
   }
 }

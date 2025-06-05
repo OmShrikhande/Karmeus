@@ -25,88 +25,101 @@
     <!-- Place this just above your <form id="multiStepForm"> -->
     <div id="formNotification" style="color: red; margin-bottom: 1em;"></div>
 
+    <!-- Number of Devices Input -->
+    <div id="deviceCountSection" class="device-count-section">
+      <h2>Device Configuration</h2>
+      <div class="form-group">
+        <label for="deviceCount">Number of Devices to Configure</label>
+        <input type="number" id="deviceCount" min="1" max="10" value="1" placeholder="Enter number of devices" required />
+      </div>
+      <button type="button" id="generateDevicesBtn" onclick="generateDeviceFields()">Generate Device Fields</button>
+    </div>
+
     <!-- Step Indicator -->
-    <div class="step-indicator">
+    <div class="step-indicator" id="stepIndicator" style="display: none;">
       <div class="active" data-step="Step 1" onclick="goToStep(0)"></div>
       <div data-step="Step 2" onclick="goToStep(1)"></div>
       <div data-step="Step 3" onclick="goToStep(2)"></div>
+      <div data-step="Step 4" onclick="goToStep(3)"></div>
     </div>
 
-    <form id="multiStepForm">
+    <form id="multiStepForm" style="display: none;">
       <!-- Step 0: Device Information -->
       <div class="step-content active" id="step0">
-        <div class="form-group">
-          <label for="deviceName">Device Name</label>
-          <input type="text" id="deviceName" placeholder="Enter device name" required />
-        </div>
-        <div class="form-group full-width">
-          <label for="deviceDescription">Description</label>
-          <textarea id="deviceDescription" placeholder="Enter device description" required></textarea>
-        </div>
-        <div class="form-group">
-          <label for="deviceType">Device Type</label>
-          <select id="deviceType" required>
-            <option value="" disabled selected>Select device type</option>
-            <option value="sensor">Sensor</option>
-            <option value="actuator">Actuator</option>
-            <option value="camera">Camera</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="appKey">App Key</label>
-          <input type="text" id="appKey" placeholder="Generated App Key" readonly />
-        </div>
-        <div class="form-group">
-          <label for="room">Room</label>
-          <input type="text" id="room" placeholder="Enter room name" required />
-        </div>
-        <div class="form-group">
-          <label for="home">Home</label>
-          <input type="text" id="home" placeholder="Enter home name" required />
-        </div>
+        <h2>Device Information</h2>
+        <!-- Device tabs will be generated here -->
+        <div id="deviceTabs" class="device-tabs"></div>
+        <!-- Device content will be generated here -->
+        <div id="deviceContent" class="device-content"></div>
       </div>
 
-      <!-- Step 1 -->
+      <!-- Step 1: Notification Settings -->
       <div class="step-content" id="step1">
         <h2>Notification Settings</h2>
         <p>Enable notifications for the following events:</p>
-        <div class="form-group">
-          <label>
-            <input type="checkbox" id="alertNotification" />
-            Alerts
-          </label>
-        </div>
-        <div class="form-group">
-          <label>
-            <input type="checkbox" id="connectDisconnectNotification" />
-            When this device connects or disconnects
-          </label>
-        </div>
-        <div class="form-group">
-          <label>
-            <input type="checkbox" id="onOffNotification" />
-            When this device is turned on or off
-          </label>
-        </div>
+        <!-- Device tabs will be generated here -->
+        <div id="notificationTabs" class="device-tabs"></div>
+        <!-- Notification content will be generated here -->
+        <div id="notificationContent" class="device-content"></div>
       </div>
 
-      <!-- Step 2 -->
+      <!-- Step 2: Device Wattage -->
       <div class="step-content" id="step2">
         <h2>Device Wattage</h2>
-        <p>Specify the wattage for this device (optional):</p>
+        <p>Specify the wattage for each device (optional):</p>
+        <!-- Device tabs will be generated here -->
+        <div id="wattageTabs" class="device-tabs"></div>
+        <!-- Wattage content will be generated here -->
+        <div id="wattageContent" class="device-content"></div>
+      </div>
+
+      <!-- Step 3: WiFi Configuration -->
+      <div class="step-content" id="step3">
+        <h2>WiFi Configuration</h2>
+        <p>Configure WiFi settings for all devices:</p>
         <div class="form-group">
-          <label for="deviceWattage">Wattage (in watts)</label>
-          <input type="number" id="deviceWattage" placeholder="Enter wattage (e.g., 100)" />
+          <label for="wifiSSID">Network Name (SSID)</label>
+          <input type="text" id="wifiSSID" placeholder="Enter WiFi network name" required />
         </div>
-        <p style="font-size: 0.9rem; color: var(--text-color);">
-          You can skip this step if you don't want to specify the wattage.
-        </p>
+        <div class="form-group">
+          <label for="wifiPassword">WiFi Password</label>
+          <input type="password" id="wifiPassword" placeholder="Enter WiFi password" required />
+        </div>
+        <div class="form-group">
+          <label for="wifiSecurity">Security Type</label>
+          <select id="wifiSecurity" required>
+            <option value="" disabled selected>Select security type</option>
+            <option value="WPA2">WPA2</option>
+            <option value="WPA3">WPA3</option>
+            <option value="WEP">WEP</option>
+            <option value="Open">Open (No Security)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="wifiChannel">WiFi Channel (Optional)</label>
+          <select id="wifiChannel">
+            <option value="">Auto</option>
+            <option value="1">Channel 1</option>
+            <option value="6">Channel 6</option>
+            <option value="11">Channel 11</option>
+            <option value="36">Channel 36</option>
+            <option value="40">Channel 40</option>
+            <option value="44">Channel 44</option>
+            <option value="48">Channel 48</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="wifiHidden" />
+            Hidden Network
+          </label>
+        </div>
       </div>
 
       <div class="form-navigation">
         <button type="button" id="prevBtn" onclick="changeStep(-1)">Back</button>
         <button type="button" id="nextBtn" onclick="validateStep()">Next</button>
-        <button type="submit" id="submitBtn" style="display:none;">Submit</button>
+        <button type="button" id="submitBtn" style="display:none;" onclick="validateStep()">Submit</button>
       </div>
     </form>
 
@@ -116,8 +129,8 @@
     </footer>
   </div>
 
+  <script src="./../js/FirebaseConfig.js"></script>
   <script src="./../js/forms.js"></script>
-  <script src="./../js/FirebaseConfig.js" ></script>
   <script>
 
 

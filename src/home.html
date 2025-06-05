@@ -18,99 +18,328 @@
   <script src="./../js/theme.js"></script>
   <script src="./../js/notifications.js"></script>
   <script src="./../js/mainhome.js"></script>
+  <script src="./../js/security-config.js"></script>
+  <script src="./../js/security-utils.js"></script>
+  <script src="./../js/security.js"></script>
 </head>
 <body>
-  <canvas id="bg-canvas" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-1;"></canvas>
-  <header class="sticky-header">
-    <span class="site-title">MySite</span>
-    <div class="header-actions">
-      <button class="theme-toggle" onclick="toggleTheme()">🌙 Toggle Theme</button>
-      <a href="#" class="logout-btn">Logout</a>
-    </div>
-  </header>
-  <div class="hero-banner">
-    <h1 style="margin-bottom: 0.2em;">Smart Device Dashboard</h1>
-    <div class="welcome-user" id="welcomeUser"></div>
+  <!-- Interactive playable background -->
+  <div class="background-container">
+    <div class="bg-gradient"></div>
+    <canvas id="interactive-bg" class="interactive-canvas"></canvas>
+    <div class="bg-particles"></div>
+  </div>
+  
+  <div class="page-wrapper">
+    <header class="sticky-header">
+      <span class="site-title">MySite</span>
+      <div class="header-actions">
+        <div class="security-indicator" title="Secure Connection">
+          <span class="security-icon">🔒</span>
+          <span class="security-text">Secure</span>
+        </div>
+        <button class="theme-toggle" onclick="toggleTheme()">🌙 Toggle Theme</button>
+        <a href="#" class="logout-btn" onclick="secureLogout()">Logout</a>
+      </div>
+    </header>
+    
+    <main class="main-content">
+      <div class="hero-banner">
+        <h1>Smart Device Dashboard</h1>
+        <div class="welcome-user" id="welcomeUser"></div>
+      </div>
+
+      <div class="container">
+        <div class="dashboard-row">
+          <button class="add-device-btn" onclick="addNewDevice()">
+            <span class="btn-icon">+</span>
+            <span class="btn-text">Add Device</span>
+          </button>
+          <button class="delete-device-btn" onclick="deleteDevice()">
+            <span class="btn-icon">🗑️</span>
+            <span class="btn-text">Delete</span>
+          </button>
+          <button class="modify-device-btn" onclick="modifyDevice()">
+            <span class="btn-icon">✏️</span>
+            <span class="btn-text">Modify</span>
+          </button>
+          <a href="security-dashboard.html" class="add-device-btn" style="background: linear-gradient(135deg, #667eea, #764ba2); text-decoration: none;">
+            <span class="btn-icon">🛡️</span>
+            <span class="btn-text">Security</span>
+          </a>
+        </div>
+        
+        <div class="devices-section">
+          <div class="device-grid" id="deviceGrid"></div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="footer-content">
+        <p>
+          &copy; 2025 <span id="companyName">Your Company</span>. All rights reserved.
+        </p>
+        <p class="developer-credit">
+          <span id="developerCredit">Developed by Om Shrikhande</span>
+        </p>
+      </div>
+    </footer>
   </div>
 
-  <div class="container">
-    <div class="dashboard-row">
-      <button class="add-device-btn" onclick="addNewDevice()">+ Add New Device</button>
-      <button class="delete-device-btn" onclick="deleteDevice()">🗑️ Delete Device</button>
-      <button class="modify-device-btn" onclick="modifyDevice()">✏️ Modify Device</button>
-    </div>
-    <div class="device-grid" id="deviceGrid"></div>
-  </div>
-
-  <footer>
-    <p>
-      &copy; 2025 Your Company. All rights reserved.<br>
-      <span id="developerCredit" style="font-size:1em; color:#666;">Developed by Om Shrikhande</span>
-    </p>
-  </footer>
-  <!-- Place this script at the end of your <body> -->
-<script>
-const canvas = document.getElementById('bg-canvas');
-const ctx = canvas.getContext('2d');
-
-function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-}
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
-
-let mouseX = canvas.width / 2;
-window.addEventListener('mousemove', e => {
-    mouseX = e.clientX;
-});
-
-// Soft pastel gradients for each wave
-function getWaveGradient(yOffset, amp) {
-    const grad = ctx.createLinearGradient(0, yOffset - amp, canvas.width, yOffset + amp);
-    grad.addColorStop(0, "rgba(120,170,255,0.18)");
-    grad.addColorStop(0.5, "rgba(180,140,255,0.22)");
-    grad.addColorStop(1, "rgba(120,255,255,0.18)");
-    return grad;
-}
-
-function drawSineWave(yOffset, amp, freq, phase, thickness, glow) {
-    ctx.save();
-    ctx.beginPath();
-    for (let x = 0; x <= canvas.width; x += 2) {
-        // Add a little random "jitter" for organic look
-        let t = (x / canvas.width) * Math.PI * 2 * freq + phase;
-        let y = yOffset + Math.sin(t) * amp * Math.sin(phase + x * 0.002) + Math.sin(t*2 + phase)*2;
-        if (x === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
+  <!-- Interactive Background Script -->
+  <script>
+    // Interactive particle system
+    class InteractiveBackground {
+      constructor() {
+        this.canvas = document.getElementById('interactive-bg');
+        this.ctx = this.canvas.getContext('2d');
+        this.particles = [];
+        this.mouse = { x: 0, y: 0, pressed: false };
+        this.connections = [];
+        
+        this.init();
+        this.bindEvents();
+        this.animate();
+      }
+      
+      init() {
+        this.resize();
+        this.createParticles();
+      }
+      
+      resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+      }
+      
+      createParticles() {
+        // Reduce particles on mobile for better performance
+        const isMobile = window.innerWidth <= 768;
+        const baseCount = isMobile ? 40 : 80;
+        const particleCount = Math.min(baseCount, Math.floor((this.canvas.width * this.canvas.height) / (isMobile ? 20000 : 15000)));
+        this.particles = [];
+        
+        for (let i = 0; i < particleCount; i++) {
+          this.particles.push({
+            x: Math.random() * this.canvas.width,
+            y: Math.random() * this.canvas.height,
+            vx: (Math.random() - 0.5) * 0.5,
+            vy: (Math.random() - 0.5) * 0.5,
+            radius: Math.random() * 2 + 1,
+            opacity: Math.random() * 0.5 + 0.2,
+            originalRadius: Math.random() * 2 + 1,
+            color: `hsl(${220 + Math.random() * 60}, 70%, 60%)`
+          });
+        }
+      }
+      
+      bindEvents() {
+        window.addEventListener('resize', () => this.resize());
+        
+        this.canvas.addEventListener('mousemove', (e) => {
+          this.mouse.x = e.clientX;
+          this.mouse.y = e.clientY;
+        });
+        
+        this.canvas.addEventListener('mousedown', () => {
+          this.mouse.pressed = true;
+        });
+        
+        this.canvas.addEventListener('mouseup', () => {
+          this.mouse.pressed = false;
+        });
+        
+        this.canvas.addEventListener('click', (e) => {
+          this.createRipple(e.clientX, e.clientY);
+        });
+        
+        // Touch events for mobile
+        this.canvas.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          const touch = e.touches[0];
+          this.mouse.x = touch.clientX;
+          this.mouse.y = touch.clientY;
+          this.mouse.pressed = true;
+          this.createRipple(touch.clientX, touch.clientY);
+        });
+        
+        this.canvas.addEventListener('touchmove', (e) => {
+          e.preventDefault();
+          const touch = e.touches[0];
+          this.mouse.x = touch.clientX;
+          this.mouse.y = touch.clientY;
+        });
+        
+        this.canvas.addEventListener('touchend', (e) => {
+          e.preventDefault();
+          this.mouse.pressed = false;
+        });
+      }
+      
+      createRipple(x, y) {
+        // Create expanding ripple effect
+        const ripple = {
+          x: x,
+          y: y,
+          radius: 0,
+          maxRadius: 100,
+          opacity: 0.8,
+          expanding: true
+        };
+        
+        const animateRipple = () => {
+          if (ripple.expanding) {
+            ripple.radius += 3;
+            ripple.opacity -= 0.02;
+            
+            if (ripple.radius >= ripple.maxRadius || ripple.opacity <= 0) {
+              return;
+            }
+            
+            this.ctx.save();
+            this.ctx.globalAlpha = ripple.opacity;
+            this.ctx.strokeStyle = '#667eea';
+            this.ctx.lineWidth = 2;
+            this.ctx.beginPath();
+            this.ctx.arc(ripple.x, ripple.y, ripple.radius, 0, Math.PI * 2);
+            this.ctx.stroke();
+            this.ctx.restore();
+            
+            requestAnimationFrame(animateRipple);
+          }
+        };
+        
+        animateRipple();
+      }
+      
+      updateParticles() {
+        this.particles.forEach(particle => {
+          // Mouse interaction
+          const dx = this.mouse.x - particle.x;
+          const dy = this.mouse.y - particle.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance < 100) {
+            const force = (100 - distance) / 100;
+            const angle = Math.atan2(dy, dx);
+            
+            if (this.mouse.pressed) {
+              // Attract to mouse when pressed
+              particle.vx += Math.cos(angle) * force * 0.01;
+              particle.vy += Math.sin(angle) * force * 0.01;
+              particle.radius = particle.originalRadius * (1 + force);
+            } else {
+              // Repel from mouse
+              particle.vx -= Math.cos(angle) * force * 0.005;
+              particle.vy -= Math.sin(angle) * force * 0.005;
+            }
+          } else {
+            particle.radius = particle.originalRadius;
+          }
+          
+          // Update position
+          particle.x += particle.vx;
+          particle.y += particle.vy;
+          
+          // Boundary collision
+          if (particle.x < 0 || particle.x > this.canvas.width) {
+            particle.vx *= -0.8;
+            particle.x = Math.max(0, Math.min(this.canvas.width, particle.x));
+          }
+          if (particle.y < 0 || particle.y > this.canvas.height) {
+            particle.vy *= -0.8;
+            particle.y = Math.max(0, Math.min(this.canvas.height, particle.y));
+          }
+          
+          // Friction
+          particle.vx *= 0.99;
+          particle.vy *= 0.99;
+        });
+      }
+      
+      drawConnections() {
+        this.ctx.strokeStyle = 'rgba(102, 126, 234, 0.1)';
+        this.ctx.lineWidth = 1;
+        
+        for (let i = 0; i < this.particles.length; i++) {
+          for (let j = i + 1; j < this.particles.length; j++) {
+            const dx = this.particles[i].x - this.particles[j].x;
+            const dy = this.particles[i].y - this.particles[j].y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < 120) {
+              const opacity = (120 - distance) / 120 * 0.2;
+              this.ctx.globalAlpha = opacity;
+              this.ctx.beginPath();
+              this.ctx.moveTo(this.particles[i].x, this.particles[i].y);
+              this.ctx.lineTo(this.particles[j].x, this.particles[j].y);
+              this.ctx.stroke();
+            }
+          }
+        }
+        this.ctx.globalAlpha = 1;
+      }
+      
+      drawParticles() {
+        this.particles.forEach(particle => {
+          this.ctx.save();
+          this.ctx.globalAlpha = particle.opacity;
+          this.ctx.fillStyle = particle.color;
+          this.ctx.shadowBlur = 10;
+          this.ctx.shadowColor = particle.color;
+          this.ctx.beginPath();
+          this.ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+          this.ctx.fill();
+          this.ctx.restore();
+        });
+      }
+      
+      animate() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        this.updateParticles();
+        this.drawConnections();
+        this.drawParticles();
+        
+        requestAnimationFrame(() => this.animate());
+      }
     }
-    ctx.strokeStyle = getWaveGradient(yOffset, amp);
-    ctx.shadowColor = "rgba(180,140,255,0.25)";
-    ctx.shadowBlur = glow;
-    ctx.lineWidth = thickness;
-    ctx.globalAlpha = 0.8;
-    ctx.stroke();
-    ctx.globalAlpha = 1;
-    ctx.restore();
-}
-
-function animate(time) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // MouseX controls frequency and amplitude
-    let freqBase = 1.5 + (mouseX / canvas.width) * 2.5;
-    let ampBase = 60 + (mouseX / canvas.width) * 80;
-    for (let i = 0; i < 18; i++) {
-        let yOffset = canvas.height * (0.3 + 0.15 * i);
-        let amp = ampBase * (0.7 + 0.2 * i);
-        let freq = freqBase + i * 0.5;
-        let phase = time * 0.001 * (0.7 + i * 0.2) + i;
-        let thickness = 4 + 1.5 * Math.sin(time * 0.001 + i);
-        let glow = 18 + 6 * Math.sin(time * 0.001 + i * 2);
-        drawSineWave(yOffset, amp, freq, phase, thickness, glow);
+    
+    // Initialize when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      new InteractiveBackground();
+    });
+    
+    // Secure logout function
+    function secureLogout() {
+      if (confirm('Are you sure you want to logout?')) {
+        // Log security event (if security manager available)
+        const userEmail = localStorage.getItem('currentUserEmail');
+        if (window.securityManager) {
+          window.securityManager.logSecurityEvent('USER_LOGOUT', { email: userEmail });
+        }
+        
+        // Clear all session data
+        localStorage.removeItem('currentUserEmail');
+        localStorage.removeItem('currentUserEmailHash');
+        localStorage.removeItem('userSession');
+        localStorage.removeItem('formData');
+        sessionStorage.clear();
+        
+        // Clear any cached data
+        if ('caches' in window) {
+          caches.keys().then(names => {
+            names.forEach(name => {
+              caches.delete(name);
+            });
+          });
+        }
+        
+        alert('You have been securely logged out.');
+        window.location.href = '../index.html';
+      }
     }
-    requestAnimationFrame(animate);
-}
-animate(0);
-</script>
+  </script>
 </body>
 </html>

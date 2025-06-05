@@ -1,5 +1,8 @@
 let currentStep = 0;
-const totalSteps = 3;
+const totalSteps = 4;
+let deviceCount = 1;
+let currentDeviceTab = 0;
+let devicesGenerated = false;
 
 // Generate a random App Key of length 32
 function generateAppKey() {
@@ -11,12 +14,299 @@ function generateAppKey() {
   return appKey;
 }
 
-// Set the App Key field with a default random value
+// SHA256 hash function
+async function sha256(message) {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Show toast notification
+function showToast(message, type = 'info') {
+  // Create toast element
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.textContent = message;
+  
+  // Style the toast
+  toast.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 5px;
+    color: white;
+    font-weight: 500;
+    z-index: 10000;
+    max-width: 300px;
+    word-wrap: break-word;
+    transition: opacity 0.3s ease;
+  `;
+  
+  // Set background color based on type
+  switch(type) {
+    case 'success':
+      toast.style.backgroundColor = '#27ae60';
+      break;
+    case 'error':
+      toast.style.backgroundColor = '#e74c3c';
+      break;
+    case 'warning':
+      toast.style.backgroundColor = '#f39c12';
+      break;
+    default:
+      toast.style.backgroundColor = '#3498db';
+  }
+  
+  // Add to page
+  document.body.appendChild(toast);
+  
+  // Remove after 3 seconds
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 300);
+  }, 3000);
+}
+
+// Initialize the form
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('appKey').value = generateAppKey();
+  console.log('Forms page loaded');
+  console.log('Firebase available:', typeof firebase !== 'undefined');
+  console.log('Firestore available:', typeof firestore !== 'undefined');
+  
+  // Check if user is logged in
+  const userEmail = localStorage.getItem('currentUserEmail');
+  console.log('Current user email:', userEmail);
+  
+  if (!userEmail) {
+    console.log('User not logged in, redirecting to login page');
+    // Uncomment the next line if you want to redirect to login
+    // window.location.href = './../index.html';
+  }
+  
   showStep(currentStep);
   updateNavigationButtons(currentStep);
 });
+
+// Generate device fields based on device count
+function generateDeviceFields() {
+  console.log('generateDeviceFields called');
+  const countInput = document.getElementById('deviceCount');
+  console.log('Device count input element:', countInput);
+  console.log('Device count value:', countInput ? countInput.value : 'not found');
+  
+  const count = parseInt(document.getElementById('deviceCount').value);
+  console.log('Parsed count:', count);
+  
+  if (count < 1 || count > 10) {
+    alert('Please enter a number between 1 and 10');
+    return;
+  }
+  
+  deviceCount = count;
+  devicesGenerated = true;
+  
+  // Hide device count section and show form
+  document.getElementById('deviceCountSection').style.display = 'none';
+  document.getElementById('stepIndicator').style.display = 'flex';
+  document.getElementById('multiStepForm').style.display = 'block';
+  
+  // Generate device fields for each step
+  generateDeviceInfoFields();
+  generateNotificationFields();
+  generateWattageFields();
+  
+  // Show first step
+  showStep(0);
+  updateNavigationButtons(0);
+}
+
+// Generate device information fields
+function generateDeviceInfoFields() {
+  const tabsContainer = document.getElementById('deviceTabs');
+  const contentContainer = document.getElementById('deviceContent');
+  
+  // Clear existing content
+  tabsContainer.innerHTML = '';
+  contentContainer.innerHTML = '';
+  
+  // Generate tabs
+  for (let i = 0; i < deviceCount; i++) {
+    const tab = document.createElement('div');
+    tab.className = `device-tab ${i === 0 ? 'active' : ''}`;
+    tab.textContent = `Device ${i + 1}`;
+    tab.onclick = () => switchDeviceTab(0, i);
+    tabsContainer.appendChild(tab);
+  }
+  
+  // Generate content panels
+  for (let i = 0; i < deviceCount; i++) {
+    const panel = document.createElement('div');
+    panel.className = `device-panel ${i === 0 ? 'active' : ''}`;
+    panel.id = `devicePanel${i}`;
+    
+    panel.innerHTML = `
+      <div class="form-group">
+        <label for="deviceName${i}">Device Name</label>
+        <input type="text" id="deviceName${i}" placeholder="Enter device name" required />
+      </div>
+      <div class="form-group full-width">
+        <label for="deviceDescription${i}">Description</label>
+        <textarea id="deviceDescription${i}" placeholder="Enter device description" required></textarea>
+      </div>
+      <div class="form-group">
+        <label for="deviceType${i}">Device Type</label>
+        <select id="deviceType${i}" required>
+          <option value="" disabled selected>Select device type</option>
+          <option value="sensor">Sensor</option>
+          <option value="actuator">Actuator</option>
+          <option value="camera">Camera</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="appKey${i}">App Key</label>
+        <input type="text" id="appKey${i}" placeholder="Generated App Key" readonly value="${generateAppKey()}" />
+      </div>
+      <div class="form-group">
+        <label for="room${i}">Room</label>
+        <input type="text" id="room${i}" placeholder="Enter room name" required />
+      </div>
+      <div class="form-group">
+        <label for="home${i}">Home</label>
+        <input type="text" id="home${i}" placeholder="Enter home name" required />
+      </div>
+    `;
+    
+    contentContainer.appendChild(panel);
+  }
+}
+
+// Generate notification fields
+function generateNotificationFields() {
+  const tabsContainer = document.getElementById('notificationTabs');
+  const contentContainer = document.getElementById('notificationContent');
+  
+  // Clear existing content
+  tabsContainer.innerHTML = '';
+  contentContainer.innerHTML = '';
+  
+  // Generate tabs
+  for (let i = 0; i < deviceCount; i++) {
+    const tab = document.createElement('div');
+    tab.className = `device-tab ${i === 0 ? 'active' : ''}`;
+    tab.textContent = `Device ${i + 1}`;
+    tab.onclick = () => switchDeviceTab(1, i);
+    tabsContainer.appendChild(tab);
+  }
+  
+  // Generate content panels
+  for (let i = 0; i < deviceCount; i++) {
+    const panel = document.createElement('div');
+    panel.className = `device-panel ${i === 0 ? 'active' : ''}`;
+    panel.id = `notificationPanel${i}`;
+    
+    panel.innerHTML = `
+      <div class="form-group">
+        <label>
+          <input type="checkbox" id="alertNotification${i}" />
+          Alerts
+        </label>
+      </div>
+      <div class="form-group">
+        <label>
+          <input type="checkbox" id="connectDisconnectNotification${i}" />
+          When this device connects or disconnects
+        </label>
+      </div>
+      <div class="form-group">
+        <label>
+          <input type="checkbox" id="onOffNotification${i}" />
+          When this device is turned on or off
+        </label>
+      </div>
+    `;
+    
+    contentContainer.appendChild(panel);
+  }
+}
+
+// Generate wattage fields
+function generateWattageFields() {
+  const tabsContainer = document.getElementById('wattageTabs');
+  const contentContainer = document.getElementById('wattageContent');
+  
+  // Clear existing content
+  tabsContainer.innerHTML = '';
+  contentContainer.innerHTML = '';
+  
+  // Generate tabs
+  for (let i = 0; i < deviceCount; i++) {
+    const tab = document.createElement('div');
+    tab.className = `device-tab ${i === 0 ? 'active' : ''}`;
+    tab.textContent = `Device ${i + 1}`;
+    tab.onclick = () => switchDeviceTab(2, i);
+    tabsContainer.appendChild(tab);
+  }
+  
+  // Generate content panels
+  for (let i = 0; i < deviceCount; i++) {
+    const panel = document.createElement('div');
+    panel.className = `device-panel ${i === 0 ? 'active' : ''}`;
+    panel.id = `wattagePanel${i}`;
+    
+    panel.innerHTML = `
+      <div class="form-group">
+        <label for="deviceWattage${i}">Wattage (in watts)</label>
+        <input type="number" id="deviceWattage${i}" placeholder="Enter wattage (e.g., 100)" />
+      </div>
+      <p style="font-size: 0.9rem; color: var(--text-color);">
+        You can skip this step if you don't want to specify the wattage.
+      </p>
+    `;
+    
+    contentContainer.appendChild(panel);
+  }
+}
+
+// Switch device tab
+function switchDeviceTab(step, deviceIndex) {
+  let tabsContainer, contentContainer, panelPrefix;
+  
+  switch(step) {
+    case 0:
+      tabsContainer = document.getElementById('deviceTabs');
+      contentContainer = document.getElementById('deviceContent');
+      panelPrefix = 'devicePanel';
+      break;
+    case 1:
+      tabsContainer = document.getElementById('notificationTabs');
+      contentContainer = document.getElementById('notificationContent');
+      panelPrefix = 'notificationPanel';
+      break;
+    case 2:
+      tabsContainer = document.getElementById('wattageTabs');
+      contentContainer = document.getElementById('wattageContent');
+      panelPrefix = 'wattagePanel';
+      break;
+  }
+  
+  // Update tabs
+  const tabs = tabsContainer.querySelectorAll('.device-tab');
+  tabs.forEach((tab, index) => {
+    tab.classList.toggle('active', index === deviceIndex);
+  });
+  
+  // Update panels
+  const panels = contentContainer.querySelectorAll('.device-panel');
+  panels.forEach((panel, index) => {
+    panel.classList.toggle('active', index === deviceIndex);
+  });
+}
 
 // Show the current step
 function showStep(step) {
@@ -37,32 +327,71 @@ function updateStepIndicator(step) {
 
 // Show/hide navigation buttons based on step
 function updateNavigationButtons(currentStep) {
-  document.getElementById('nextBtn').style.display = currentStep === 2 ? 'none' : '';
-  document.getElementById('submitBtn').style.display = currentStep === 2 ? '' : 'none';
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const submitBtn = document.getElementById('submitBtn');
+  
+  prevBtn.style.display = currentStep === 0 ? 'none' : '';
+  nextBtn.style.display = currentStep === totalSteps - 1 ? 'none' : '';
+  submitBtn.style.display = currentStep === totalSteps - 1 ? '' : 'none';
 }
 
 // Navigate to a specific step
 function goToStep(step) {
-  document.querySelectorAll('.step-content')[currentStep].classList.remove('active');
+  if (!devicesGenerated) {
+    alert('Please generate device fields first');
+    return;
+  }
+  
   currentStep = step;
-  document.querySelectorAll('.step-content')[currentStep].classList.add('active');
+  showStep(currentStep);
   updateNavigationButtons(currentStep);
 }
 
 // Change the step
 function changeStep(dir) {
-  document.querySelectorAll('.step-content')[currentStep].classList.remove('active');
+  if (!devicesGenerated) {
+    alert('Please generate device fields first');
+    return;
+  }
+  
   currentStep += dir;
-  document.querySelectorAll('.step-content')[currentStep].classList.add('active');
+  showStep(currentStep);
   updateNavigationButtons(currentStep);
 }
 
 // Validate the current step
-function validateStep() {
-  const inputs = document.querySelectorAll(`#step${currentStep} input, #step${currentStep} textarea, #step${currentStep} select`);
-  for (const input of inputs) {
-    if (input.hasAttribute('required') && !input.value.trim()) {
-      alert('Please fill out all required fields.');
+async function validateStep() {
+  if (!devicesGenerated) {
+    alert('Please generate device fields first');
+    return;
+  }
+  
+  // Validate based on current step
+  if (currentStep === 0) {
+    // Validate device information for all devices
+    for (let i = 0; i < deviceCount; i++) {
+      const deviceName = document.getElementById(`deviceName${i}`);
+      const deviceDescription = document.getElementById(`deviceDescription${i}`);
+      const deviceType = document.getElementById(`deviceType${i}`);
+      const room = document.getElementById(`room${i}`);
+      const home = document.getElementById(`home${i}`);
+      
+      if (!deviceName.value.trim() || !deviceDescription.value.trim() || 
+          !deviceType.value || !room.value.trim() || !home.value.trim()) {
+        alert(`Please fill out all required fields for Device ${i + 1}`);
+        switchDeviceTab(0, i);
+        return;
+      }
+    }
+  } else if (currentStep === 3) {
+    // Validate WiFi settings
+    const wifiSSID = document.getElementById('wifiSSID');
+    const wifiPassword = document.getElementById('wifiPassword');
+    const wifiSecurity = document.getElementById('wifiSecurity');
+    
+    if (!wifiSSID.value.trim() || !wifiPassword.value.trim() || !wifiSecurity.value) {
+      alert('Please fill out all required WiFi fields');
       return;
     }
   }
@@ -70,126 +399,170 @@ function validateStep() {
   if (currentStep < totalSteps - 1) {
     changeStep(1);
   } else {
-    saveFormData(); // Save data and redirect on the last step
+    // On the last step, submit to Firestore and then save to localStorage
+    const success = await submitFormToFirestore();
+    if (success) {
+      saveFormData(); // Save data and redirect on the last step
+    }
   }
 }
 
 // Collect form data and save it to localStorage
 function saveFormData() {
+  console.log('saveFormData called, deviceCount:', deviceCount);
+  const devices = [];
+  
+  // Collect data for each device
+  for (let i = 0; i < deviceCount; i++) {
+    const deviceData = {
+      deviceName: document.getElementById(`deviceName${i}`).value,
+      deviceDescription: document.getElementById(`deviceDescription${i}`).value,
+      deviceType: document.getElementById(`deviceType${i}`).value,
+      appKey: document.getElementById(`appKey${i}`).value,
+      room: document.getElementById(`room${i}`).value,
+      home: document.getElementById(`home${i}`).value,
+      notifications: {
+        alerts: document.getElementById(`alertNotification${i}`).checked,
+        connectDisconnect: document.getElementById(`connectDisconnectNotification${i}`).checked,
+        onOff: document.getElementById(`onOffNotification${i}`).checked,
+      },
+      wattage: document.getElementById(`deviceWattage${i}`).value || 'Not specified',
+    };
+    devices.push(deviceData);
+    console.log(`Device ${i + 1} data:`, deviceData);
+  }
+  
+  // Collect WiFi data
+  const wifiData = {
+    ssid: document.getElementById('wifiSSID').value,
+    password: document.getElementById('wifiPassword').value,
+    security: document.getElementById('wifiSecurity').value,
+    channel: document.getElementById('wifiChannel').value || 'Auto',
+    hidden: document.getElementById('wifiHidden').checked,
+  };
+  
   const formData = {
-    deviceName: document.getElementById('deviceName').value,
-    deviceDescription: document.getElementById('deviceDescription').value,
-    deviceType: document.getElementById('deviceType').value,
-    appKey: document.getElementById('appKey').value,
-    room: document.getElementById('room').value,
-    home: document.getElementById('home').value,
-    notifications: {
-      alerts: document.getElementById('alertNotification').checked,
-      connectDisconnect: document.getElementById('connectDisconnectNotification').checked,
-      onOff: document.getElementById('onOffNotification').checked,
-    },
-    wattage: document.getElementById('deviceWattage').value || 'Not specified', // Optional field
+    deviceCount: deviceCount,
+    devices: devices,
+    wifi: wifiData,
   };
 
+  console.log('Final form data to save:', formData);
+  
   // Save the data to localStorage
   localStorage.setItem('formData', JSON.stringify(formData));
+  
+  console.log('Data saved to localStorage');
 
-  // Redirect to credential.php
+  // Redirect to credential.html
   window.location.href = './credential.html';
 }
 
-// Firestore form submission
-document.getElementById('multiStepForm').addEventListener('submit', async function(e) {
-  e.preventDefault();
-
-  // Get values from form
-  const deviceName = document.getElementById('deviceName').value.trim();
-  const deviceDescription = document.getElementById('deviceDescription').value.trim();
-  const deviceType = document.getElementById('deviceType').value;
-  const appKey = document.getElementById('appKey').value.trim();
-  const room = document.getElementById('room').value.trim();
-  const home = document.getElementById('home').value.trim();
-  const deviceWattage = document.getElementById('deviceWattage').value.trim();
-  const alertNotification = document.getElementById('alertNotification').checked;
-  const connectDisconnectNotification = document.getElementById('connectDisconnectNotification').checked;
-  const onOffNotification = document.getElementById('onOffNotification').checked;
-
+// Firestore form submission function
+async function submitFormToFirestore() {
+  console.log('submitFormToFirestore called');
+  
   // Get user Gmail from localStorage
   const usergmail = localStorage.getItem('currentUserEmail');
   const notificationDiv = document.getElementById('formNotification');
   if (!usergmail) {
     notificationDiv.textContent = 'User not logged in!';
     notificationDiv.style.color = 'red';
-    return;
+    return false;
   } else {
     notificationDiv.textContent = '';
   }
 
   // Hash the email for the collection name
   const userCollection = await sha256(usergmail);
-
-  // Prepare data
-  const deviceData = {
-    deviceName,
-    deviceDescription,
-    deviceType,
-    appKey,
-    home,
-    deviceWattage: deviceWattage || null,
-    alertNotification,
-    connectDisconnectNotification,
-    onOffNotification,
-    devicestatus: "off"
-  };
+  const collectionRef = firestore.collection(userCollection);
 
   try {
-    // Use the hashed collection name
-    const collectionRef = firestore.collection(userCollection);
+    // Collect WiFi data
+    const wifiData = {
+      ssid: document.getElementById('wifiSSID').value.trim(),
+      password: document.getElementById('wifiPassword').value.trim(),
+      security: document.getElementById('wifiSecurity').value,
+      channel: document.getElementById('wifiChannel').value || 'Auto',
+      hidden: document.getElementById('wifiHidden').checked,
+    };
 
-    // Check for duplicate deviceName or appKey
-    const deviceDoc = await collectionRef.doc(deviceName).get();
-    if (deviceDoc.exists) {
-      showToast('A device with this name already exists!', 'error');
-      return;
+    // Process each device
+    const devices = [];
+    const duplicateNames = [];
+    const duplicateKeys = [];
+
+    for (let i = 0; i < deviceCount; i++) {
+      const deviceName = document.getElementById(`deviceName${i}`).value.trim();
+      const deviceDescription = document.getElementById(`deviceDescription${i}`).value.trim();
+      const deviceType = document.getElementById(`deviceType${i}`).value;
+      const appKey = document.getElementById(`appKey${i}`).value.trim();
+      const room = document.getElementById(`room${i}`).value.trim();
+      const home = document.getElementById(`home${i}`).value.trim();
+      const deviceWattage = document.getElementById(`deviceWattage${i}`).value.trim();
+      const alertNotification = document.getElementById(`alertNotification${i}`).checked;
+      const connectDisconnectNotification = document.getElementById(`connectDisconnectNotification${i}`).checked;
+      const onOffNotification = document.getElementById(`onOffNotification${i}`).checked;
+
+      // Check for duplicate deviceName
+      const deviceDoc = await collectionRef.doc(deviceName).get();
+      if (deviceDoc.exists) {
+        duplicateNames.push(deviceName);
+        continue;
+      }
+
+      // Check for same appKey
+      const appKeyQuery = await collectionRef.where('appKey', '==', appKey).get();
+      if (!appKeyQuery.empty) {
+        duplicateKeys.push(appKey);
+        continue;
+      }
+
+      const deviceData = {
+        deviceName,
+        deviceDescription,
+        deviceType,
+        appKey,
+        room,
+        home,
+        deviceWattage: deviceWattage || null,
+        alertNotification,
+        connectDisconnectNotification,
+        onOffNotification,
+        devicestatus: "off"
+      };
+
+      devices.push(deviceData);
     }
 
-    // Check for same appKey
-    const appKeyQuery = await collectionRef.where('appKey', '==', appKey).get();
-    if (!appKeyQuery.empty) {
-      showToast('A device with this App Key already exists!', 'error');
-      return;
+    // Show errors if any duplicates found
+    if (duplicateNames.length > 0) {
+      showToast(`Devices with these names already exist: ${duplicateNames.join(', ')}`, 'error');
+      return false;
+    }
+    if (duplicateKeys.length > 0) {
+      showToast(`Devices with these App Keys already exist: ${duplicateKeys.join(', ')}`, 'error');
+      return false;
     }
 
-    // If no duplicates, add the device
-    await collectionRef.doc(deviceName).set({
-      ...deviceData,
-      room
+    // Save all devices to Firestore
+    const batch = firestore.batch();
+    devices.forEach(device => {
+      const deviceRef = collectionRef.doc(device.deviceName);
+      batch.set(deviceRef, device);
     });
 
-    // Save ALL device info to localStorage for credential.html
-    localStorage.setItem('formData', JSON.stringify({
-      deviceName,
-      deviceDescription,
-      deviceType,
-      appKey,
-      room,
-      home,
-      deviceWattage: deviceWattage || null,
-      alertNotification,
-      connectDisconnectNotification,
-      onOffNotification
-    }));
+    await batch.commit();
+    console.log('Devices saved to Firestore successfully');
 
-    showToast('Device details saved successfully!', 'success');
-    setTimeout(() => {
-      window.location.href = './credential.html';
-    }, 1200);
-    document.getElementById('multiStepForm').reset();
+    showToast(`${devices.length} device(s) saved successfully!`, 'success');
+    return true;
   } catch (error) {
     showToast('Failed to save device details.', 'error');
-    console.error('Error saving device:', error);
+    console.error('Error saving devices:', error);
+    return false;
   }
-}); // <-- This closes the event listener!
+}
 
 // Function to set the theme
 function setTheme(theme) {

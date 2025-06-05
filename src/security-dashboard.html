@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Security Dashboard - MySite</title>
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <script src="../js/security.js"></script>
+  <style>
+    .security-dashboard {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 2rem;
+    }
+    
+    .security-card {
+      background: var(--bg-card);
+      border-radius: var(--border-radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-md);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .security-card h3 {
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .security-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    
+    .status-secure {
+      background: rgba(72, 187, 120, 0.1);
+      color: var(--success-color);
+      border: 1px solid var(--success-color);
+    }
+    
+    .status-warning {
+      background: rgba(237, 137, 54, 0.1);
+      color: var(--warning-color);
+      border: 1px solid var(--warning-color);
+    }
+    
+    .security-metric {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .security-metric:last-child {
+      border-bottom: none;
+    }
+    
+    .metric-value {
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    
+    .security-log {
+      max-height: 300px;
+      overflow-y: auto;
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: var(--border-radius);
+      padding: 1rem;
+    }
+    
+    .log-entry {
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+      background: var(--bg-card);
+      border-radius: 0.5rem;
+      font-size: 0.85rem;
+      border-left: 3px solid var(--primary-color);
+    }
+    
+    .log-timestamp {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+    
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      background: var(--primary-color);
+      color: white;
+      text-decoration: none;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      transition: var(--transition);
+      margin-bottom: 2rem;
+    }
+    
+    .back-btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <div class="background-container">
+    <div class="bg-gradient"></div>
+    <div class="bg-particles"></div>
+  </div>
+  
+  <div class="page-wrapper">
+    <header class="sticky-header">
+      <span class="site-title">Security Dashboard</span>
+      <div class="header-actions">
+        <div class="security-indicator" title="Secure Connection">
+          <span class="security-icon">🔒</span>
+          <span class="security-text">Secure</span>
+        </div>
+        <button class="theme-toggle" onclick="toggleTheme()">🌙 Toggle Theme</button>
+        <a href="home.html" class="logout-btn">← Back</a>
+      </div>
+    </header>
+    
+    <main class="main-content">
+      <div class="security-dashboard">
+        <a href="home.html" class="back-btn">
+          <span>←</span>
+          <span>Back to Dashboard</span>
+        </a>
+        
+        <div class="security-card">
+          <h3>🛡️ Security Status</h3>
+          <div id="securityStatus" class="security-status status-secure">
+            <span>🔒</span>
+            <span>Your account is secure</span>
+          </div>
+          <div class="security-metric">
+            <span>Session Status</span>
+            <span id="sessionStatus" class="metric-value">Active</span>
+          </div>
+          <div class="security-metric">
+            <span>Last Login</span>
+            <span id="lastLogin" class="metric-value">-</span>
+          </div>
+          <div class="security-metric">
+            <span>Failed Login Attempts</span>
+            <span id="failedAttempts" class="metric-value">0</span>
+          </div>
+          <div class="security-metric">
+            <span>Account Locked</span>
+            <span id="accountLocked" class="metric-value">No</span>
+          </div>
+        </div>
+        
+        <div class="security-card">
+          <h3>📊 Security Metrics</h3>
+          <div class="security-metric">
+            <span>CSRF Protection</span>
+            <span class="metric-value">✅ Enabled</span>
+          </div>
+          <div class="security-metric">
+            <span>Session Timeout</span>
+            <span class="metric-value">30 minutes</span>
+          </div>
+          <div class="security-metric">
+            <span>Rate Limiting</span>
+            <span class="metric-value">✅ Active</span>
+          </div>
+          <div class="security-metric">
+            <span>Input Sanitization</span>
+            <span class="metric-value">✅ Enabled</span>
+          </div>
+          <div class="security-metric">
+            <span>Secure Headers</span>
+            <span class="metric-value">✅ Applied</span>
+          </div>
+        </div>
+        
+        <div class="security-card">
+          <h3>📝 Security Activity Log</h3>
+          <div id="securityLog" class="security-log">
+            <p>Loading security events...</p>
+          </div>
+        </div>
+        
+        <div class="security-card">
+          <h3>🔧 Security Actions</h3>
+          <button onclick="clearSecurityLog()" class="add-device-btn" style="margin-right: 1rem;">
+            Clear Security Log
+          </button>
+          <button onclick="generateNewPassword()" class="modify-device-btn" style="margin-right: 1rem;">
+            Generate Secure Password
+          </button>
+          <button onclick="forceLogout()" class="delete-device-btn">
+            Force Logout All Sessions
+          </button>
+        </div>
+      </div>
+    </main>
+    
+    <footer>
+      <div class="footer-content">
+        <p>&copy; 2025 Your Company. All rights reserved.</p>
+        <p class="developer-credit">Developed by Om Shrikhande</p>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Initialize security dashboard
+    document.addEventListener('DOMContentLoaded', () => {
+      // Validate session
+      if (!window.securityManager.validateUserSession()) {
+        return;
+      }
+      
+      loadSecurityData();
+      loadSecurityLog();
+      
+      // Update every 30 seconds
+      setInterval(loadSecurityData, 30000);
+    });
+    
+    function loadSecurityData() {
+      const userEmail = localStorage.getItem('currentUserEmail');
+      const sessionData = JSON.parse(localStorage.getItem('userSession') || '{}');
+      
+      // Update session status
+      document.getElementById('sessionStatus').textContent = 
+        sessionData.loginTime ? 'Active' : 'Inactive';
+      
+      // Update last login
+      if (sessionData.loginTime) {
+        const loginDate = new Date(sessionData.loginTime);
+        document.getElementById('lastLogin').textContent = 
+          loginDate.toLocaleString();
+      }
+      
+      // Check failed attempts
+      const attempts = JSON.parse(localStorage.getItem(`login_attempts_${userEmail}`) || '[]');
+      const failedAttempts = attempts.filter(a => !a.success).length;
+      document.getElementById('failedAttempts').textContent = failedAttempts;
+      
+      // Check if account is locked
+      const isLocked = window.securityManager.isAccountLocked(userEmail);
+      document.getElementById('accountLocked').textContent = isLocked ? 'Yes' : 'No';
+      
+      // Update security status
+      const statusEl = document.getElementById('securityStatus');
+      if (isLocked || failedAttempts > 3) {
+        statusEl.className = 'security-status status-warning';
+        statusEl.innerHTML = '<span>⚠️</span><span>Security concerns detected</span>';
+      } else {
+        statusEl.className = 'security-status status-secure';
+        statusEl.innerHTML = '<span>🔒</span><span>Your account is secure</span>';
+      }
+    }
+    
+    function loadSecurityLog() {
+      const securityLog = JSON.parse(localStorage.getItem('securityLog') || '[]');
+      const logContainer = document.getElementById('securityLog');
+      
+      if (securityLog.length === 0) {
+        logContainer.innerHTML = '<p>No security events recorded.</p>';
+        return;
+      }
+      
+      const logHtml = securityLog
+        .slice(-20) // Show last 20 events
+        .reverse()
+        .map(event => `
+          <div class="log-entry">
+            <div><strong>${event.type}</strong></div>
+            <div class="log-timestamp">${new Date(event.timestamp).toLocaleString()}</div>
+            <div>${JSON.stringify(event, null, 2).substring(0, 200)}...</div>
+          </div>
+        `).join('');
+      
+      logContainer.innerHTML = logHtml;
+    }
+    
+    function clearSecurityLog() {
+      if (confirm('Are you sure you want to clear the security log?')) {
+        localStorage.removeItem('securityLog');
+        window.securityManager.logSecurityEvent('LOG_CLEARED', { 
+          email: localStorage.getItem('currentUserEmail') 
+        });
+        loadSecurityLog();
+        alert('Security log cleared.');
+      }
+    }
+    
+    function generateNewPassword() {
+      const newPassword = window.securityManager.generateSecurePassword(16);
+      prompt('Here is a secure password (copy it):', newPassword);
+    }
+    
+    function forceLogout() {
+      if (confirm('This will log you out of all sessions. Continue?')) {
+        localStorage.clear();
+        sessionStorage.clear();
+        alert('All sessions have been terminated.');
+        window.location.href = '../index.html';
+      }
+    }
+    
+    function toggleTheme() {
+      const root = document.documentElement;
+      const current = root.getAttribute("data-theme");
+      const newTheme = current === "dark" ? "light" : "dark";
+      root.setAttribute("data-theme", newTheme);
+      localStorage.setItem("theme", newTheme);
+    }
+    
+    // Load saved theme
+    (function () {
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme) {
+        document.documentElement.setAttribute("data-theme", savedTheme);
+      }
+    })();
+  </script>
+</body>
+</html>
