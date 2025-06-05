@@ -256,6 +256,96 @@ class SecurityManager {
     window.location.href = '../index.html';
   }
 
+  // Comprehensive logout function
+  performSecureLogout(reason = 'user_initiated', options = {}) {
+    const userEmail = localStorage.getItem('currentUserEmail');
+    const sessionData = localStorage.getItem('userSession');
+    
+    // Log logout event
+    this.logSecurityEvent('SECURE_LOGOUT_INITIATED', {
+      userEmail: userEmail,
+      reason: reason,
+      timestamp: Date.now(),
+      options: options
+    });
+    
+    return new Promise((resolve) => {
+      // Step 1: Clear authentication data
+      localStorage.removeItem('currentUserEmail');
+      localStorage.removeItem('currentUserEmailHash');
+      localStorage.removeItem('userSession');
+      localStorage.removeItem('formData');
+      
+      // Step 2: Clear security-related data (but keep security logs if requested)
+      if (!options.keepSecurityLogs) {
+        localStorage.removeItem('securityLog');
+      }
+      
+      // Step 3: Clear rate limiting data
+      const keys = Object.keys(localStorage);
+      keys.forEach(key => {
+        if (key.startsWith('login_attempts_') || key.startsWith('rate_limit_')) {
+          localStorage.removeItem(key);
+        }
+      });
+      
+      // Step 4: Clear session storage
+      sessionStorage.clear();
+      
+      // Step 5: Clear cookies
+      if (options.clearCookies !== false) {
+        document.cookie.split(";").forEach(function(c) { 
+          document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+        });
+      }
+      
+      // Step 6: Clear caches
+      if ('caches' in window && options.clearCaches !== false) {
+        caches.keys().then(names => {
+          names.forEach(name => {
+            caches.delete(name);
+          });
+        });
+      }
+      
+      // Step 7: Reset security state
+      this.csrfToken = this.generateCSRFToken();
+      this.rateLimits.clear();
+      
+      // Step 8: Log completion
+      this.logSecurityEvent('SECURE_LOGOUT_COMPLETED', {
+        userEmail: userEmail,
+        reason: reason,
+        timestamp: Date.now()
+      });
+      
+      resolve({
+        success: true,
+        userEmail: userEmail,
+        timestamp: Date.now()
+      });
+    });
+  }
+
+  // Emergency logout (for security threats)
+  emergencyLogout(threat = 'unknown') {
+    this.logSecurityEvent('EMERGENCY_LOGOUT', {
+      threat: threat,
+      timestamp: Date.now(),
+      userAgent: navigator.userAgent
+    });
+    
+    // Immediate logout without confirmation
+    this.performSecureLogout('security_threat', {
+      clearCookies: true,
+      clearCaches: true,
+      keepSecurityLogs: true // Keep logs for investigation
+    }).then(() => {
+      alert('Security threat detected. You have been logged out for your protection.');
+      window.location.href = '../index.html';
+    });
+  }
+
   setupActivityMonitoring() {
     const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
     
@@ -372,11 +462,82 @@ class SecurityManager {
     return 'client-side-unknown';
   }
 
-  generateSecurePassword(length = 12) {
-    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+  generateSecurePassword(length = 16, options = {}) {
+    const defaults = {
+      includeUppercase: true,
+      includeLowercase: true,
+      includeNumbers: true,
+      includeSymbols: true,
+      excludeSimilar: true, // Exclude similar looking characters (0, O, l, 1, etc.)
+      excludeAmbiguous: true, // Exclude ambiguous characters
+      mustIncludeAll: true // Ensure at least one character from each selected type
+    };
+    
+    const config = { ...defaults, ...options };
+    
+    let charset = '';
+    const charSets = {
+      lowercase: 'abcdefghijklmnopqrstuvwxyz',
+      uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+      numbers: '0123456789',
+      symbols: '!@#$%^&*()_+-=[]{}|;:,.<>?'
+    };
+    
+    // Build charset based on options
+    if (config.includeLowercase) charset += charSets.lowercase;
+    if (config.includeUppercase) charset += charSets.uppercase;
+    if (config.includeNumbers) charset += charSets.numbers;
+    if (config.includeSymbols) charset += charSets.symbols;
+    
+    // Remove similar/ambiguous characters if requested
+    if (config.excludeSimilar) {
+      charset = charset.replace(/[0O1lI]/g, '');
+    }
+    if (config.excludeAmbiguous) {
+      charset = charset.replace(/[{}[\]()\/\\'"~,;.<>]/g, '');
+    }
+    
+    // Generate password
     const array = new Uint8Array(length);
     crypto.getRandomValues(array);
-    return Array.from(array, byte => charset[byte % charset.length]).join('');
+    let password = Array.from(array, byte => charset[byte % charset.length]).join('');
+    
+    // Ensure password meets requirements if mustIncludeAll is true
+    if (config.mustIncludeAll) {
+      const requirements = [];
+      if (config.includeLowercase) requirements.push({ chars: charSets.lowercase, name: 'lowercase' });
+      if (config.includeUppercase) requirements.push({ chars: charSets.uppercase, name: 'uppercase' });
+      if (config.includeNumbers) requirements.push({ chars: charSets.numbers, name: 'numbers' });
+      if (config.includeSymbols) requirements.push({ chars: charSets.symbols, name: 'symbols' });
+      
+      // Check if password meets all requirements
+      let attempts = 0;
+      while (attempts < 10) {
+        let meetsAll = true;
+        for (const req of requirements) {
+          if (!req.chars.split('').some(char => password.includes(char))) {
+            meetsAll = false;
+            break;
+          }
+        }
+        
+        if (meetsAll) break;
+        
+        // Regenerate if doesn't meet requirements
+        crypto.getRandomValues(array);
+        password = Array.from(array, byte => charset[byte % charset.length]).join('');
+        attempts++;
+      }
+    }
+    
+    // Log password generation event
+    this.logSecurityEvent('SECURE_PASSWORD_GENERATED', {
+      length: length,
+      options: config,
+      strength: this.checkPasswordStrength(password)
+    });
+    
+    return password;
   }
 
   // ===== Public API =====

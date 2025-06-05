@@ -5,6 +5,89 @@ This application implements a multi-layered security system designed to protect 
 
 ## 🔧 Security Components
 
+### Key Security Features Explained
+
+#### 🔐 **Generate Secure Password**
+**Purpose**: Creates cryptographically strong passwords that meet all security requirements.
+
+**How it works**:
+1. Uses `crypto.getRandomValues()` for true randomness
+2. Supports customizable length (8-64 characters)
+3. Multiple character set options (uppercase, lowercase, numbers, symbols)
+4. Excludes similar characters (0, O, 1, l) to prevent confusion
+5. Ensures password meets all selected requirements
+6. Provides real-time strength analysis
+7. One-click copy to clipboard functionality
+
+**Security Benefits**:
+- Eliminates weak user-generated passwords
+- Prevents password reuse across sites
+- Meets enterprise security standards
+- Reduces human error in password creation
+
+**Usage**:
+```javascript
+// Basic usage
+const password = securityManager.generateSecurePassword(16);
+
+// Advanced usage with options
+const password = securityManager.generateSecurePassword(20, {
+  includeUppercase: true,
+  includeLowercase: true,
+  includeNumbers: true,
+  includeSymbols: false,
+  excludeSimilar: true
+});
+```
+
+#### 🚪 **Force Logout System**
+**Purpose**: Immediately terminates all active sessions and clears sensitive data.
+
+**What it clears**:
+1. **Authentication Data**: User email, session tokens, password hashes
+2. **Session Storage**: All temporary session data
+3. **Local Storage**: User preferences, cached data, form data
+4. **Rate Limiting Data**: Login attempts, request counters
+5. **Browser Cookies**: Authentication cookies, tracking cookies
+6. **Browser Cache**: Cached pages, resources, API responses
+7. **Security State**: CSRF tokens, rate limit counters
+
+**Types of Logout**:
+
+1. **Standard Force Logout** (`performSecureLogout()`):
+   - User-initiated with confirmation
+   - Comprehensive data cleanup
+   - Detailed progress display
+   - Audit trail logging
+
+2. **Emergency Logout** (`emergencyLogout()`):
+   - Automatic threat response
+   - No user confirmation required
+   - Immediate execution
+   - Preserves security logs for investigation
+
+**Security Benefits**:
+- Prevents session hijacking
+- Clears sensitive data exposure
+- Maintains audit trail
+- Enables threat response
+- Ensures complete state reset
+
+**Usage**:
+```javascript
+// Standard logout
+securityManager.performSecureLogout('user_initiated', {
+  clearCookies: true,
+  clearCaches: true,
+  keepSecurityLogs: false
+});
+
+// Emergency logout
+securityManager.emergencyLogout('suspicious_activity');
+```
+
+## 🔧 Security Components
+
 ### 1. Core Security Manager (`security.js`)
 The main security orchestrator that coordinates all security features.
 
